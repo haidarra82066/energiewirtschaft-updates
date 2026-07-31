@@ -3,7 +3,9 @@
 Die App ist eine einzige Datei (`index.html`) – jedes statische Hosting funktioniert. Dieser Ordner (`C:\Users\RamiHaidar\OneDrive\Projects\Energiewirtschaft Updates`) ist zugleich ein Git-Repository.
 
 ## Option A: GitHub Pages (Standard-Weg, kostenlos, dauerhaft)
-Das Repository heißt `energiewirtschaft-updates`. Nach jedem Inhalts-Update genügt:
+Repository: **https://github.com/haidarra82066/energiewirtschaft-updates** · Live-Seite: **https://haidarra82066.github.io/energiewirtschaft-updates/**
+
+Nach jedem Inhalts-Update genügt:
 ```
 cd "C:\Users\RamiHaidar\OneDrive\Projects\Energiewirtschaft Updates"
 git add -A

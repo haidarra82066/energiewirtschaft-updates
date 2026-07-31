@@ -2,7 +2,7 @@
 
 Interaktive Wissenskarte des europäischen und deutschen Energierechts plus regelmäßig aktualisiertes Energie-Briefing – als **eine einzige, komplett eigenständige HTML-Datei** ([index.html](index.html)), ohne Build-Schritt und ohne externe Abhängigkeiten.
 
-**Live:** _wird nach dem ersten Deployment hier verlinkt (GitHub Pages)_
+**Live:** https://haidarra82066.github.io/energiewirtschaft-updates/ · **Repo:** https://github.com/haidarra82066/energiewirtschaft-updates
 
 ## Was die App kann
 
