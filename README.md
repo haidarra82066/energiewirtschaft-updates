@@ -31,7 +31,9 @@ Alles liegt in `index.html`:
 | `EXTRA` | Kennzahlen (KPIs) und offizielle Dokumente je Rechtsakt für die Detailansicht |
 | `NCAT` / `NEWS` | Kategorien und Meldungen des Energie-Briefings |
 
-Auch Icons/Grafiken sind als Base64-Data-URIs eingebettet – die Datei funktioniert offline und auf jedem statischen Hosting.
+Auch Grafiken sind als Base64-Data-URIs eingebettet – die Datei funktioniert offline und auf jedem statischen Hosting.
+
+**App-Icon:** Für „Zum Home-Bildschirm“ (iPhone/iPad) und die Installation unter Android liegen zusätzlich `apple-touch-icon.png` (180×180), `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` und `manifest.json` neben `index.html` – iOS und Android akzeptieren für Homebildschirm-Icons keine eingebetteten Data-URIs. Das Favicon für den Browser-Tab steckt weiterhin inline in `index.html`. Wer die Seite auf ein anderes Hosting kopiert, sollte diese Dateien mitnehmen.
 
 ## Aktualisieren & Deployment
 

@@ -16,7 +16,7 @@ GitHub Pages baut die Seite automatisch neu (Settings → Pages → Branch `main
 
 ## Option B: Netlify Drop (schnellster Weg ohne Git)
 1. Öffne **https://app.netlify.com/drop**
-2. Ziehe `vroni-atlas-deploy.zip` per Drag & Drop auf die Seite (enthält `index.html`)
+2. Ziehe `vroni-atlas-deploy.zip` per Drag & Drop auf die Seite (enthält `index.html`, `manifest.json` und die App-Icons)
 3. Du bekommst sofort eine öffentliche URL; mit kostenlosem Netlify-Konto bleibt sie dauerhaft und ist umbenennbar (z. B. `vroni-atlas.netlify.app`)
 
 ## Option C: Vercel (kostenlos)
@@ -26,6 +26,11 @@ cd "C:\Users\RamiHaidar\OneDrive\Projects\Energiewirtschaft Updates"
 vercel --prod
 ```
 (Beim ersten Mal: Login-Link im Browser bestätigen.)
+
+## 📱 Icon auf dem Homebildschirm
+Neben `index.html` müssen `manifest.json`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` und `icon-maskable-512.png` mit hochgeladen werden – sonst zeigt iOS beim Speichern auf dem Homebildschirm statt eines Icons nur einen Screenshot der Seite. Bei GitHub Pages passiert das automatisch mit; bei Netlify/Vercel nur, wenn der ganze Ordner bzw. das Zip hochgeladen wird.
+
+Wer die Seite vorher schon gespeichert hat: iOS merkt sich das alte Icon. Verknüpfung einmal löschen und in Safari über **Teilen → Zum Home-Bildschirm** neu anlegen.
 
 ## 🔄 Nach Vronis Updates
 Vroni aktualisiert `index.html` in diesem OneDrive-Ordner (montags Fakten-Check, Mo/Mi/Fr News). Danach einfach neu veröffentlichen:
