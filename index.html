@@ -6,6 +6,11 @@
 <meta name="theme-color" id="tcolor" content="#f1f4fa">
 <title>Vronis Energierecht-Atlas – EU & Deutschland</title>
 <meta name="apple-mobile-web-app-title" content="Energie-Atlas">
+<!-- Vom Homebildschirm ohne Browser-Leiste starten (iOS braucht das zusätzlich
+     zum manifest; nur so sind auf iPhone/iPad überhaupt Hinweise möglich). -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- Gespeicherten Modus vor dem ersten Rendern setzen (kein Aufblitzen).
      Ohne Speicherwert bleibt es beim Standard: hell. -->
 <script>(function(){try{var t=localStorage.getItem("vroni-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
@@ -121,6 +126,17 @@
     transition:transform .35s cubic-bezier(.32,.72,0,1);
   }
   #side.hidden{transform:translateX(-100%);}
+  /* Schließen-Knopf + Abdunkelung nur mobil (dort liegt die Sidebar über der Karte) */
+  #sideclose{
+    display:none; position:absolute; top:14px; right:12px; width:30px; height:30px; border:none; cursor:pointer;
+    border-radius:50%; background:var(--f2); color:var(--ink2); font-size:14px; line-height:1; z-index:2; font-family:inherit;
+  }
+  #sideclose:hover{background:var(--f4); color:var(--ink);}
+  #scrim{
+    display:none; position:fixed; inset:0; z-index:19; background:rgba(2,6,16,.42);
+    opacity:0; pointer-events:none; transition:opacity .32s;
+  }
+  body.sideopen #scrim{opacity:1; pointer-events:auto;}
   .brand{display:flex; align-items:center; gap:11px; margin-bottom:4px;}
   .brand h1{font-size:15.5px;font-weight:700;letter-spacing:-.02em;}
   .brand small{display:block;font-size:11px;color:var(--ink2);font-weight:500;}
@@ -174,8 +190,11 @@
   /* ---------- Canvas ---------- */
   #wrap{position:fixed;inset:0;left:288px;transition:left .35s cubic-bezier(.32,.72,0,1);}
   body.full #wrap{left:0;}
-  svg#net{width:100%;height:100%;display:block;cursor:grab;}
+  /* touch-action:none → Wischen/Pinchen auf der Karte steuert die Karte
+     (Pan, Pinch-Zoom) und nicht den Browser. */
+  svg#net{width:100%;height:100%;display:block;cursor:grab;touch-action:none;}
   svg#net.panning{cursor:grabbing;}
+  .node.grabbed .inner{transform:scale(1.12);}
   /* ---------- Schwebende Bedienelemente ---------- */
   #zoomctl{position:fixed;right:16px;top:16px;z-index:15;display:flex;flex-direction:column;gap:8px;}
   .zbtn{
@@ -188,6 +207,8 @@
   .zbtn:active{transform:scale(.94);}
   #menubtn{position:fixed;left:16px;top:16px;z-index:25;display:none;}
   body.full #menubtn{display:flex;}
+  #hint .mob{display:none;}
+  #hint.gone{opacity:0;pointer-events:none;transition:opacity .5s;}
   #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:15;font-size:11px;color:var(--ink2);
     background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--cardline);border-radius:999px;padding:5px 14px;box-shadow:var(--shadow);}
   /* ---------- Detail-Card ---------- */
@@ -273,21 +294,27 @@
   /* ---------- Tab-Bar ---------- */
   #tabs{position:fixed;top:16px;left:calc(50% + 144px);transform:translateX(-50%);z-index:16;display:flex;align-items:center;gap:4px;background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--cardline);border-radius:999px;box-shadow:var(--shadow);padding:4px;}
   body.full #tabs{left:50%;}
-  .tab{padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;border:none;background:none;display:flex;align-items:center;gap:6px;transition:all .2s;font-family:inherit;}
+  .tab{padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;border:none;background:none;display:flex;align-items:center;gap:6px;transition:all .2s;font-family:inherit;white-space:nowrap;}
   .tab:hover{color:var(--ink);}
   .tab.on{background:var(--pill-bg);color:var(--pill-ink);box-shadow:var(--shadow-sm);}
   .tab.on:hover{color:var(--pill-ink);}
+  .tab .kurz{display:none;}
+  /* Punkt am Briefing-Tab, solange es ungelesene Meldungen gibt */
+  .tab .ndot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:none;
+    background:var(--waerme);background:color-mix(in srgb, var(--waerme) 85%, var(--basemix));}
+  .tab.hasnew .ndot{display:block;}
   .tabstand{font-size:11px;color:var(--ink2);padding:0 10px 0 8px;border-left:1px solid var(--cardline);margin-left:4px;white-space:nowrap;display:flex;align-items:center;gap:6px;}
   .tabstand .live{width:6px;height:6px;border-radius:50%;background:var(--ik);box-shadow:0 0 0 3px var(--acc-ring);}
-  /* ---------- Hell/Dunkel-Umschalter ---------- */
-  #themebtn{
+  /* ---------- Hell/Dunkel-Umschalter & Glocke ---------- */
+  #themebtn,#notifybtn{
     width:30px;height:30px;flex-shrink:0;margin-left:2px;border:none;border-radius:50%;cursor:pointer;
     background:var(--f2);color:var(--ink2);display:flex;align-items:center;justify-content:center;
     transition:background .18s, color .18s, transform .18s;font-family:inherit;
   }
-  #themebtn:hover{background:var(--f4);color:var(--ink);}
-  #themebtn:active{transform:scale(.9);}
-  #themebtn svg{width:15px;height:15px;display:block;}
+  #themebtn:hover,#notifybtn:hover{background:var(--f4);color:var(--ink);}
+  #themebtn:active,#notifybtn:active{transform:scale(.9);}
+  #themebtn svg,#notifybtn svg{width:15px;height:15px;display:block;}
+  #notifybtn.on{color:var(--accent);background:var(--acc2);}
   #themebtn .i-sun{display:none;}
   :root[data-theme="dark"] #themebtn .i-moon{display:none;}
   :root[data-theme="dark"] #themebtn .i-sun{display:block;}
@@ -364,20 +391,117 @@
   #toast button{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--ink2);cursor:pointer;font-size:13px;}
   #toast button:hover{color:var(--ink);}
   .brand img.vav{width:40px;height:40px;object-fit:contain;filter:drop-shadow(var(--img-shadow));}
-  /* ---------- Responsive ---------- */
+  /* ---------- Neu-Marker & Update-Banner ---------- */
+  .nnew{
+    font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;
+    flex-shrink:0;color:#fff;background:var(--waerme);background:color-mix(in srgb, var(--waerme) 88%, var(--basemix));
+  }
+  #newbanner{
+    position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-14px);z-index:34;
+    display:none;align-items:center;gap:10px;max-width:calc(100vw - 24px);
+    background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+    border:1px solid var(--acc-line);border-radius:999px;box-shadow:var(--shadow);padding:7px 8px 7px 15px;
+    font-size:12.5px;font-weight:600;color:var(--ink);opacity:0;transition:opacity .3s, transform .3s;
+  }
+  #newbanner.show{display:flex;opacity:1;transform:translateX(-50%);}
+  #newbanner .btxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #newbanner button{
+    border:none;border-radius:999px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;
+    padding:6px 12px;background:var(--pill-bg);color:var(--pill-ink);flex-shrink:0;
+  }
+  #newbanner button.x{background:var(--f2);color:var(--ink2);padding:6px 9px;font-weight:600;}
+  /* ---------- Benachrichtigungs-Einstellungen ---------- */
+  #modalwrap{
+    position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px;
+    background:rgba(2,6,16,.45);
+  }
+  #modalwrap.on{display:flex;}
+  #nmodal{
+    position:relative;width:100%;max-width:430px;max-height:min(88vh,760px);overflow-y:auto;
+    background:var(--panel-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+    border:1px solid var(--cardline);border-radius:22px;box-shadow:var(--shadow-lg);padding:20px 20px 18px;
+  }
+  #nmodal h2{font-size:17px;font-weight:700;letter-spacing:-.02em;padding-right:30px;}
+  #nmodal .sub{font-size:12.5px;color:var(--ink2);line-height:1.5;margin-top:5px;}
+  #nmclose{
+    position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--f2);color:var(--ink2);font-size:14px;line-height:1;font-family:inherit;
+  }
+  #nmclose:hover{background:var(--f4);color:var(--ink);}
+  .nstat{
+    font-size:11.5px;line-height:1.55;color:var(--prose);background:var(--card2);
+    border:1px solid var(--cardline);border-radius:13px;padding:10px 12px;margin:12px 0 2px;
+  }
+  .nstat b{color:var(--ink);}
+  .nrow{display:flex;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--cardline);}
+  .nrow:last-of-type{border-bottom:none;}
+  .nrow label{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;flex:1;line-height:1.35;}
+  .nrow input[type=checkbox]{width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:var(--accent);cursor:pointer;}
+  .nrow .sd{display:block;font-size:11px;font-weight:500;color:var(--ink2);margin-top:3px;line-height:1.45;}
+  .ncatgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+  .ncatgrid .nrow{border-bottom:none;padding:6px 0;}
+  .ncatgrid .nrow label{font-size:12.5px;font-weight:500;}
+  .ncatgrid .cd{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+    background:var(--c);background:color-mix(in srgb, var(--c) var(--dotmix), var(--basemix));}
+  .nbtnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+  .nbtn{
+    flex:1;min-width:110px;padding:9px 12px;border-radius:11px;border:1px solid var(--cardline);cursor:pointer;
+    background:var(--f1);color:var(--ink);font-size:12.5px;font-weight:600;font-family:inherit;transition:background .15s;
+  }
+  .nbtn:hover{background:var(--f3);}
+  .nbtn.prim{background:var(--pill-bg);color:var(--pill-ink);border-color:transparent;}
+  .nbtn:disabled{opacity:.45;cursor:default;}
+  #nmnote{font-size:11px;color:var(--ink2);line-height:1.5;margin-top:10px;min-height:15px;}
+  /* ---------- Responsive: mobiles Layout ----------
+     --top / --bot = obere/untere Sicherheitszone (Notch, Home-Indikator).
+     Alles Schwebende hängt daran, damit sich nichts überlappt:
+     Zeile 1 (oben) = Menü + Tab-Bar, darunter der Hinweis/Banner,
+     unten rechts die Zoom-Knöpfe, darüber Toast, ganz unten der Hinweis. */
   @media (max-width:900px){
-    #side{width:262px;transform:translateX(-100%);}
+    :root{--top:max(10px, env(safe-area-inset-top)); --bot:max(12px, env(safe-area-inset-bottom));}
+    #side{
+      width:min(300px,86vw);transform:translateX(-100%);
+      overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+      padding-top:max(18px, env(safe-area-inset-top));padding-bottom:calc(var(--bot) + 6px);
+    }
     #side.mobileopen{transform:none;box-shadow:var(--shadow-lg);}
+    #sideclose{display:flex;}
+    #scrim{display:block;}
+    .brand{padding-right:36px;}
+    .legend{margin-top:22px;}
     #wrap{left:0;}
-    #panel{width:calc(100vw - 24px);top:auto;height:62vh;bottom:12px;right:12px;border-radius:22px;}
-    #menubtn{display:flex;}
-    #hint{display:none;}
-    #tabs{left:50%;top:12px;}
+    #panel{width:calc(100vw - 24px);top:auto;height:min(62vh,560px);bottom:var(--bot);right:12px;border-radius:22px;}
+    #menubtn{display:flex;left:12px;top:var(--top);width:36px;height:36px;border-radius:11px;}
+    /* Tab-Bar bleibt einzeilig: Kurz-Labels statt Umbruch (das war die Überlappung) */
+    #tabs{left:50%;top:var(--top);gap:2px;padding:3px;}
+    .tab{padding:7px 11px;font-size:12px;}
+    .tab .lang{display:none;}
+    .tab .kurz{display:inline;}
     .tabstand{display:none;}
-    #newsview{left:0;padding-top:70px;}
+    /* Hinweis + Banner unter die Tab-Bar, damit sie nichts verdecken */
+    #hint{display:block;top:calc(var(--top) + 46px);bottom:auto;left:50%;font-size:10.5px;padding:5px 12px;
+      max-width:calc(100vw - 24px);text-align:center;transition:opacity .5s;}
+    #hint .desk{display:none;}
+    #hint .mob{display:inline;}
+    #newbanner{top:calc(var(--top) + 46px);font-size:12px;padding:6px 7px 6px 13px;}
+    #zoomctl{right:12px;top:auto;bottom:var(--bot);flex-direction:row;gap:7px;}
+    .zbtn{width:36px;height:36px;}
+    #newsview{left:0;padding-top:calc(var(--top) + 54px);padding-bottom:calc(var(--bot) + 40px);}
     #tip{display:none;}
-    .nhead img{width:58px;}
-    #toast{max-width:calc(100vw - 24px);right:12px;bottom:12px;}
+    .nhead{gap:12px;}
+    .nhead img{width:52px;}
+    .nhead h2{font-size:21px;}
+    #toast{max-width:calc(100vw - 24px);right:12px;bottom:calc(var(--bot) + 46px);}
+    #toast.hide{transform:translateY(150%);}
+    /* Sidebar offen: schwebende Elemente weg – sonst schneidet die Sidebar sie an */
+    body.sideopen #tabs,body.sideopen #menubtn,body.sideopen #zoomctl,body.sideopen #hint,body.sideopen #toast{
+      opacity:0;pointer-events:none;transition:opacity .2s;
+    }
+    #nmodal{padding:18px 16px 16px;border-radius:20px;}
+    .ncatgrid{grid-template-columns:1fr;}
+  }
+  @media (max-width:380px){
+    .tab{padding:7px 9px;font-size:11.5px;}
   }
   @media (prefers-reduced-motion:reduce){
     .pulse{display:none;} .node .inner{transition:none;}
@@ -387,7 +511,10 @@
 </head>
 <body>
 
+<div id="scrim"></div>
+
 <aside id="side">
+  <button id="sideclose" type="button" aria-label="Menü schließen" title="Schließen">✕</button>
   <div class="brand">
     <img class="vav" src="data:image/png;base64,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" alt="Vroni, die Energieexpertin">
     <div><h1>Vronis Energierecht-Atlas</h1><small>EU · Deutschland · kuratiert von Vroni</small></div>
@@ -430,9 +557,12 @@
 </div></section>
 
 <div id="tabs">
-  <button class="tab on" data-view="map" aria-pressed="true">🧠 Wissenskarte</button>
-  <button class="tab" data-view="news" aria-pressed="false">📰 Energie-Briefing</button>
+  <button class="tab on" data-view="map" aria-pressed="true" aria-label="Wissenskarte">🧠 <span class="lang">Wissenskarte</span><span class="kurz">Karte</span></button>
+  <button class="tab" data-view="news" aria-pressed="false" aria-label="Energie-Briefing">📰 <span class="lang">Energie-Briefing</span><span class="kurz">Briefing</span><span class="ndot"></span></button>
   <span class="tabstand"><span class="live"></span>Stand: 31.07.2026</span>
+  <button id="notifybtn" type="button" aria-label="Benachrichtigungen einstellen" title="Benachrichtigungen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9A6 6 0 1 0 6 9c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>
+  </button>
   <button id="themebtn" type="button" aria-pressed="false" aria-label="Dunklen Modus einschalten" title="Dunkelmodus (T)">
     <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
     <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg>
@@ -446,9 +576,44 @@
   <button class="zbtn" id="zout" title="Verkleinern">−</button>
   <button class="zbtn" id="zfit" title="Gesamtansicht" style="font-size:13px">⌖</button>
 </div>
-<div id="hint">Klick = Details · Ziehen = Verschieben · Scrollen = Zoom · Knoten sind verschiebbar</div>
+<div id="hint"><span class="desk">Klick = Details · Ziehen = Verschieben · Scrollen = Zoom · Knoten sind verschiebbar</span><span class="mob">Ziehen = Verschieben · 2 Finger = Zoom · Tippen = Details</span></div>
 
 <div id="panel"><div id="pbar"></div><button id="close">✕</button><div id="pscroll"><div id="pcontent"></div></div></div>
+
+<!-- Hinweis auf neue Meldungen (in der App, unabhängig von Systemhinweisen) -->
+<div id="newbanner" role="status"></div>
+
+<!-- Benachrichtigungs-Einstellungen -->
+<div id="modalwrap" role="dialog" aria-modal="true" aria-labelledby="nmtitle">
+  <div id="nmodal">
+    <button id="nmclose" type="button" aria-label="Schließen">✕</button>
+    <h2 id="nmtitle">🔔 Benachrichtigungen</h2>
+    <p class="sub">Vroni meldet sich, wenn neue Beiträge im Energie-Briefing stehen oder der Atlas neu geprüft wurde.</p>
+    <div class="nstat" id="nmstatus"></div>
+    <div class="nrow">
+      <label for="nmon"><input type="checkbox" id="nmon"><span>Benachrichtigungen aktivieren<span class="sd" id="nmonsd">Fragt einmalig die Erlaubnis des Geräts ab.</span></span></label>
+    </div>
+    <div class="sect" style="margin:16px 2px 2px">Themen</div>
+    <p class="sub" style="margin:0 2px 4px;font-size:11px">Gilt für die Systemhinweise – in der App markiert Vroni immer alle neuen Beiträge.</p>
+    <div class="ncatgrid" id="nmcats"></div>
+    <div class="nrow" style="border-top:1px solid var(--cardline)">
+      <label for="nmacts"><input type="checkbox" id="nmacts"><span>Wissenskarte<span class="sd">Wenn Vroni die Rechtsakte geprüft und den Stand aktualisiert hat.</span></span></label>
+    </div>
+    <div class="sect" style="margin:16px 2px 4px">Wann</div>
+    <div class="nrow">
+      <label for="nmbg"><input type="checkbox" id="nmbg"><span>Auch im Hintergrund prüfen<span class="sd" id="nmbgsd"></span></span></label>
+    </div>
+    <div class="nrow">
+      <label for="nmquiet"><input type="checkbox" id="nmquiet"><span>Ruhezeit 22–7 Uhr<span class="sd">In dieser Zeit kommen keine Hinweise; du siehst sie beim nächsten Öffnen.</span></span></label>
+    </div>
+    <div class="nbtnrow">
+      <button class="nbtn" id="nmtest" type="button">Test-Hinweis</button>
+      <button class="nbtn" id="nmcheck" type="button">Jetzt prüfen</button>
+      <button class="nbtn prim" id="nmdone" type="button">Fertig</button>
+    </div>
+    <div id="nmnote"></div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -906,6 +1071,20 @@ N.forEach(n=>{
 });
 /* ---- ViewBox / Pan / Zoom ---- */
 let vb={x:0,y:0,w:100,h:100};
+/* Ausdehnung des Netzes → daraus die Zoom-Grenzen (gilt für Rad, Knöpfe und Pinch) */
+const WORLD=(function(){
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  N.forEach(n=>{x0=Math.min(x0,n.x-n.w/2);y0=Math.min(y0,n.y-n.h/2);x1=Math.max(x1,n.x+n.w/2);y1=Math.max(y1,n.y+n.h/2);});
+  return {w:x1-x0,h:y1-y0};
+})();
+const ZMIN=170, ZMAX=Math.max(2400,WORLD.w*1.7);
+/* Zoomfaktor so begrenzen, dass man weder im Nichts landet noch alles winzig wird */
+function clampF(f){
+  const w=vb.w*f;
+  if(w<ZMIN) return ZMIN/vb.w;
+  if(w>ZMAX) return ZMAX/vb.w;
+  return f;
+}
 function fitAll(animate){
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   N.forEach(n=>{ if(nodeEls[n.id].style.display==="none")return;
@@ -925,6 +1104,7 @@ function tweenVB(t){
   })(t0);
 }
 function zoom(f,cx,cy){
+  f=clampF(f);
   const mx=cx!==undefined?cx:vb.x+vb.w/2, my=cy!==undefined?cy:vb.y+vb.h/2;
   tweenVB({x:mx-(mx-vb.x)*f, y:my-(my-vb.y)*f, w:vb.w*f, h:vb.h*f});
 }
@@ -935,25 +1115,71 @@ svg.addEventListener("wheel",e=>{
   e.preventDefault();
   const r=svg.getBoundingClientRect();
   const mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h;
-  const f=e.deltaY>0?1.09:0.92;
+  const f=clampF(e.deltaY>0?1.09:0.92);
   vb={x:mx-(mx-vb.x)*f, y:my-(my-vb.y)*f, w:vb.w*f, h:vb.h*f}; applyVB();
 },{passive:false});
-/* Pan + Node-Drag */
-let panning=false, dragging=null, ps={x:0,y:0};
+/* ---- Bedienung: Pan, Pinch-Zoom, Knoten ziehen ----
+   Ein Zeiger  = Karte verschieben (auch wenn man auf einem Knoten startet)
+   Zwei Zeiger = Pinch-Zoom + Zwei-Finger-Verschieben
+   Tippen      = Details, Doppeltipp = näher, langes Drücken = Knoten aufnehmen
+   Maus bleibt wie gehabt: Knoten direkt ziehen, Rad = Zoom. */
+const ptrs=new Map();
+let panning=false, dragging=null, ps={x:0,y:0}, panDist=0, pinch=null, gesture=false;
+let lpT=null, lpNode=null, lpPt={x:0,y:0}, lastTap=0, lastTapPt={x:0,y:0};
 function evtPt(e){ const r=svg.getBoundingClientRect(); return {x:vb.x+(e.clientX-r.left)/r.width*vb.w, y:vb.y+(e.clientY-r.top)/r.height*vb.h}; }
 let dragStart={x:0,y:0}, grabOff={x:0,y:0};
+function clearLP(){ if(lpT){clearTimeout(lpT); lpT=null;} lpNode=null; }
+function stopDrag(){ if(dragging){ nodeEls[dragging.id].classList.remove("grabbed"); dragging=null; } }
+function twoPt(){
+  const it=ptrs.values(), a=it.next().value, b=it.next().value;
+  return {d:Math.hypot(a.x-b.x,a.y-b.y), x:(a.x+b.x)/2, y:(a.y+b.y)/2};
+}
+function beginPinch(){
+  clearLP(); stopDrag(); panning=false; svg.classList.remove("panning");
+  gesture=true; tip.classList.remove("show"); pinch=twoPt();
+}
+function pinchMove(){
+  const m=twoPt(), r=svg.getBoundingClientRect();
+  if(pinch && pinch.d>0 && m.d>0){
+    const f=clampF(pinch.d/m.d);          /* Finger auseinander → f<1 → näher ran */
+    const wx=vb.x+(pinch.x-r.left)/r.width*vb.w, wy=vb.y+(pinch.y-r.top)/r.height*vb.h;
+    const nw=vb.w*f, nh=vb.h*f;
+    vb={x:wx-(wx-vb.x)*f-(m.x-pinch.x)*nw/r.width,
+        y:wy-(wy-vb.y)*f-(m.y-pinch.y)*nh/r.height, w:nw, h:nh};
+    applyVB();
+  }
+  pinch=m;
+}
 svg.addEventListener("pointerdown",e=>{
-  const ng=e.target.closest(".node");
-  if(ng){
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  try{ svg.setPointerCapture(e.pointerId); }catch(err){}
+  if(ptrs.size>=2){ beginPinch(); return; }
+  gesture=false; panDist=0; ps={x:e.clientX,y:e.clientY};
+  const ng=e.target.closest(".node"), touch=(e.pointerType!=="mouse");
+  if(ng && !touch){
     dragging=nodeMap[ng.dataset.id]; dragging.moved=false;
     dragStart={x:e.clientX,y:e.clientY};
     const p=evtPt(e); grabOff={x:dragging.x-p.x, y:dragging.y-p.y};
-    svg.setPointerCapture(e.pointerId); return;
+    return;
   }
-  panning=true; svg.classList.add("panning"); ps={x:e.clientX,y:e.clientY}; svg.setPointerCapture(e.pointerId);
-  document.getElementById("tip").classList.remove("show");
+  if(ng && touch){
+    lpNode=nodeMap[ng.dataset.id]; lpPt={x:e.clientX,y:e.clientY};
+    lpT=setTimeout(()=>{
+      lpT=null; if(!lpNode) return;
+      dragging=lpNode; lpNode=null; dragging.moved=true; dragStart={x:lpPt.x,y:lpPt.y};
+      const p=evtPt({clientX:lpPt.x,clientY:lpPt.y}); grabOff={x:dragging.x-p.x, y:dragging.y-p.y};
+      nodeEls[dragging.id].classList.add("grabbed");
+      panning=false; svg.classList.remove("panning");
+      if(navigator.vibrate){ try{ navigator.vibrate(12); }catch(err){} }
+    },420);
+  }
+  panning=true; svg.classList.add("panning");
+  tip.classList.remove("show");
 });
 svg.addEventListener("pointermove",e=>{
+  if(ptrs.has(e.pointerId)) ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size>=2){ pinchMove(); return; }
+  if(lpT && Math.hypot(e.clientX-lpPt.x,e.clientY-lpPt.y)>9) clearLP();
   if(dragging){
     if(!dragging.moved && Math.hypot(e.clientX-dragStart.x, e.clientY-dragStart.y)<5) return;
     dragging.moved=true;
@@ -961,14 +1187,39 @@ svg.addEventListener("pointermove",e=>{
   }
   if(!panning)return;
   const r=svg.getBoundingClientRect();
+  panDist+=Math.hypot(e.clientX-ps.x, e.clientY-ps.y);
   vb.x-=(e.clientX-ps.x)*vb.w/r.width; vb.y-=(e.clientY-ps.y)*vb.h/r.height;
   ps={x:e.clientX,y:e.clientY}; applyVB();
 });
-svg.addEventListener("pointerup",e=>{
-  if(dragging){ if(!dragging.moved) select(dragging.id); dragging=null; }
-  if(panning && Math.abs(e.clientX-ps.x)<3 && Math.abs(e.clientY-ps.y)<3) deselect();
-  panning=false; svg.classList.remove("panning");
-});
+function tapEmpty(e){
+  const now=performance.now();
+  if(now-lastTap<330 && Math.hypot(e.clientX-lastTapPt.x,e.clientY-lastTapPt.y)<30){
+    lastTap=0; const p=evtPt(e); zoom(0.6,p.x,p.y); return;   /* Doppeltipp = näher ran */
+  }
+  lastTap=now; lastTapPt={x:e.clientX,y:e.clientY};
+  deselect();
+}
+function endPtr(e,cancel){
+  ptrs.delete(e.pointerId);
+  if(ptrs.size>=2){ beginPinch(); return; }
+  if(ptrs.size===1){                       /* aus Pinch wird nahtlos Verschieben */
+    const p=ptrs.values().next().value;
+    pinch=null; stopDrag(); clearLP();
+    panning=true; svg.classList.add("panning"); ps={x:p.x,y:p.y}; panDist=999; gesture=true;
+    return;
+  }
+  pinch=null;
+  const tapN=lpT?lpNode:null; clearLP();
+  if(dragging){ const d=dragging; stopDrag(); if(!d.moved) select(d.id); }
+  else if(!cancel && tapN && panDist<10) select(tapN.id);
+  else if(!cancel && !gesture && panning && panDist<6) tapEmpty(e);
+  panning=false; gesture=false; svg.classList.remove("panning");
+}
+svg.addEventListener("pointerup",e=>endPtr(e,false));
+svg.addEventListener("pointercancel",e=>endPtr(e,true));
+/* Safari/iOS: eigene Seiten-Zoom-Gesten auf der Karte unterdrücken */
+svg.addEventListener("touchmove",e=>{ if(e.touches.length>1) e.preventDefault(); },{passive:false});
+["gesturestart","gesturechange","gestureend"].forEach(t=>svg.addEventListener(t,e=>e.preventDefault()));
 /* ---- Animation: Atmen + Synapsen-Pulse ---- */
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let frame=0;
@@ -1043,6 +1294,8 @@ function setFocus(id){
 function select(id){
   selId=id;
   tip.classList.remove("show");
+  hideToast();
+  if(innerWidth<=900) setSide(false);   /* mobil: Menü zu, damit die Karte frei liegt */
   N.forEach(n=>nodeEls[n.id].classList.toggle("sel",n.id===id));
   setFocus(id);
   const n=nodeMap[id];
@@ -1087,7 +1340,11 @@ function select(id){
 function deselect(){ selId=null; N.forEach(n=>nodeEls[n.id].classList.remove("sel")); setFocus(null); panel.classList.remove("open"); }
 document.getElementById("close").addEventListener("click",deselect);
 addEventListener("keydown",e=>{
-  if(e.key==="Escape")deselect();
+  if(e.key==="Escape"){
+    if(document.getElementById("modalwrap").classList.contains("on")){ closeNotifyModal(); return; }
+    if(sideEl.classList.contains("mobileopen")){ setSide(false); return; }
+    deselect();
+  }
   if(document.activeElement===searchIn||e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==="/"){e.preventDefault();searchIn.focus();}
   if(e.key==="t"||e.key==="T"){e.preventDefault();toggleTheme();}
@@ -1132,9 +1389,15 @@ document.getElementById("resetbtn").addEventListener("click",()=>{
   document.querySelectorAll(".lvl").forEach(b=>b.classList.add("on"));
   deselect(); applyFilters(); fitAll(true);
 });
-document.getElementById("menubtn").addEventListener("click",()=>{
-  document.getElementById("side").classList.toggle("mobileopen");
-});
+/* Sidebar mobil: Abdunkeln, Schließen-Knopf, und schwebende Elemente ausblenden */
+const sideEl=document.getElementById("side"), scrimEl=document.getElementById("scrim");
+function setSide(open){
+  sideEl.classList.toggle("mobileopen",open);
+  document.body.classList.toggle("sideopen",open);
+}
+document.getElementById("menubtn").addEventListener("click",()=>setSide(!sideEl.classList.contains("mobileopen")));
+document.getElementById("sideclose").addEventListener("click",()=>setSide(false));
+scrimEl.addEventListener("click",()=>setSide(false));
 function applyFilters(){
   const q=searchIn.value.trim().toLowerCase();
   N.forEach(n=>{
@@ -1267,6 +1530,269 @@ const NEWS=[
  w:"Für Industriekunden ändern sich Audit- und EnMS-Pflichten (Schwellenlogik statt Unternehmensgröße) – Compliance-Prozesse und Energiedatenerfassung rechtzeitig anpassen.",
  src:[{t:"Bundestag – hib-Meldung",u:"https://www.bundestag.de/presse/hib/kurzmeldungen-1201142"},{t:"Grant Thornton – Überblick",u:"https://www.grantthornton.de/themen/2026/novelle-energieeffizienzgesetz-und-energiedienstleistungsgesetz/"},{t:"Bird & Bird – Analyse",u:"https://www.twobirds.com/de/insights/2026/germany/novelle-des-energieeffizienzgesetzes-und-des-gesetzes-%C3%BCber-energiedienstleistungen-%E2%80%93-ein-%C3%BCberblick"}]}
 ];
+/* ================= BENACHRICHTIGUNGEN =================
+   Diese Seite läuft ohne Server. Echtes Web-Push (Hinweis kommt an, obwohl die
+   App gar nicht läuft) braucht einen Push-Server und ist deshalb hier nicht
+   möglich. Umgesetzt ist stattdessen:
+   1. Beim Öffnen bzw. Zurückholen der App prüft die Seite, ob es neue Beiträge
+      gibt, und schickt einen Systemhinweis – das klappt auch auf iPhone/iPad,
+      wenn die App vom Homebildschirm gestartet wurde.
+   2. Wo der Browser es kann (Chrome/Android, installierte App), prüft der
+      Service Worker zusätzlich periodisch im Hintergrund (periodicSync).
+   3. In der App: NEU-Marker an den Karten, Banner oben, Zähler am App-Icon.
+   Einstellungen liegen in localStorage ("vroni-notify"), der Merker über
+   gesehene Beiträge in "vroni-seen". */
+const NCFG_KEY="vroni-notify", NSEEN_KEY="vroni-seen", NDONE_KEY="vroni-notified", NSTAND_KEY="vroni-standdone";
+const STAND=(document.getElementById("newsstamp").textContent||"").trim();
+const NCAT_KEYS=Object.keys(NCAT);
+function jsonLS(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+function setLS(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function defCfg(){ const c={}; NCAT_KEYS.forEach(k=>c[k]=true); return {on:false,bg:true,quiet:true,acts:true,cats:c}; }
+let cfg=defCfg();
+(function(){
+  const s=jsonLS(NCFG_KEY,null);
+  if(s&&typeof s==="object") cfg=Object.assign(cfg,s,{cats:Object.assign(cfg.cats,s.cats||{})});
+})();
+function saveCfg(){ setLS(NCFG_KEY,cfg); sendState(); }
+/* ---- Was kennt dieses Gerät schon? ---- */
+let freshSet=new Set(), standNew=false;
+function seenNow(){ return {titles:NEWS.map(x=>x.t),stand:STAND,ts:Date.now()}; }
+(function(){
+  const s=jsonLS(NSEEN_KEY,null);
+  if(!s||!Array.isArray(s.titles)){ setLS(NSEEN_KEY,seenNow()); return; }  /* erster Besuch: nichts ist „neu“ */
+  NEWS.forEach(x=>{ if(s.titles.indexOf(x.t)<0) freshSet.add(x.t); });
+  standNew=!!s.stand && s.stand!==STAND;
+})();
+/* Für die Anzeige eingefroren: die NEU-Marker bleiben sichtbar, auch wenn der
+   Zähler beim Lesen zurückgesetzt wird. */
+const freshShown=new Set(freshSet);
+function markSeen(){
+  setLS(NSEEN_KEY,seenNow());
+  freshSet=new Set(); standNew=false; sendState(); hideBanner();
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("hasnew"));
+  try{ if(navigator.clearAppBadge) navigator.clearAppBadge(); }catch(e){}
+}
+/* ---- Banner in der App ---- */
+const bannerEl=document.getElementById("newbanner");
+function banner(text,label,fn){
+  bannerEl.innerHTML="";
+  const t=document.createElement("span"); t.className="btxt"; t.textContent=text; bannerEl.appendChild(t);
+  if(label){
+    const b=document.createElement("button"); b.type="button"; b.textContent=label;
+    b.addEventListener("click",()=>{ hideBanner(); if(fn) fn(); }); bannerEl.appendChild(b);
+  }
+  const x=document.createElement("button"); x.type="button"; x.className="x"; x.textContent="✕";
+  x.setAttribute("aria-label","Hinweis schließen");
+  x.addEventListener("click",hideBanner); bannerEl.appendChild(x);
+  bannerEl.classList.add("show");
+  document.getElementById("hint").classList.add("gone");   /* mobil derselbe Platz */
+}
+function hideBanner(){ bannerEl.classList.remove("show"); }
+function showFreshUI(){
+  const n=freshSet.size;
+  const tab=document.querySelector('.tab[data-view="news"]');
+  if(tab) tab.classList.toggle("hasnew",n>0||standNew);
+  try{
+    if(navigator.setAppBadge){ if(n>0) navigator.setAppBadge(n); else if(navigator.clearAppBadge) navigator.clearAppBadge(); }
+  }catch(e){}
+  if(n>0) banner(n===1?"1 neuer Beitrag im Briefing":n+" neue Beiträge im Briefing","Ansehen",()=>{ showView("news"); });
+  else if(standNew) banner("Vroni hat den Atlas geprüft · Stand "+STAND,"Ok",markSeen);
+}
+/* ---- Systemhinweise ---- */
+function quietNow(){ const h=new Date().getHours(); return h>=22||h<7; }
+async function fire(title,body,tag){
+  if(typeof Notification==="undefined"||Notification.permission!=="granted") return false;
+  const opts={body:body,tag:tag||"vroni",icon:"icon-192.png",badge:"icon-192.png",lang:"de",data:{u:"./#briefing"}};
+  try{
+    if("serviceWorker" in navigator){
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg&&reg.showNotification){ await reg.showNotification(title,opts); return true; }
+    }
+    new Notification(title,opts); return true;      /* Fallback für Desktop-Browser */
+  }catch(e){ return false; }
+}
+async function notifyNews(items,standText){
+  if(!cfg.on) return false;
+  if(cfg.quiet&&quietNow()) return false;
+  const done=jsonLS(NDONE_KEY,[]);
+  const pick=items.filter(x=>cfg.cats[x.cat]!==false&&done.indexOf(x.t)<0);
+  if(pick.length){
+    const title=pick.length===1?"Neu im Energie-Briefing":pick.length+" neue Beiträge im Energie-Briefing";
+    const body=pick.slice(0,3).map(x=>"• "+x.t).join("\n")+(pick.length>3?"\n… und "+(pick.length-3)+" weitere":"");
+    if(await fire(title,body,"vroni-news")){ setLS(NDONE_KEY,done.concat(pick.map(x=>x.t)).slice(-80)); return true; }
+    return false;
+  }
+  if(standText&&cfg.acts&&jsonLS(NSTAND_KEY,"")!==standText){
+    if(await fire("Vroni hat den Atlas geprüft","Neuer Stand: "+standText,"vroni-stand")){ setLS(NSTAND_KEY,standText); return true; }
+  }
+  return false;
+}
+/* ---- Läuft schon eine neuere Fassung auf dem Server? ---- */
+function parseNewsHTML(html){
+  const out=[], re=/^\{d:"([^"]*)",cat:"([^"]*)",t:"((?:[^"\\]|\\.)*)"/gm; let m;
+  while((m=re.exec(html))) out.push({d:m[1],cat:m[2],t:m[3]});
+  return out;
+}
+let lastCheck=0, checking=false;
+async function checkUpdates(manual){
+  if(checking) return null;
+  if(!manual && Date.now()-lastCheck<9*60*1000) return null;
+  checking=true; lastCheck=Date.now();
+  try{
+    const res=await fetch("./?v="+Date.now(),{cache:"no-store"});
+    if(!res.ok) throw new Error("http "+res.status);
+    const html=await res.text();
+    const items=parseNewsHTML(html);
+    if(!items.length) throw new Error("Format unbekannt");
+    const stand=(html.match(/id="newsstamp">([^<]*)</)||[])[1]||"";
+    const known={}; NEWS.forEach(x=>{ known[x.t]=1; });
+    const neu=items.filter(x=>!known[x.t]);
+    if(neu.length){
+      await notifyNews(neu,"");
+      banner(neu.length===1?"1 neuer Beitrag verfügbar":neu.length+" neue Beiträge verfügbar","Neu laden",()=>location.reload());
+    } else if(stand&&STAND&&stand!==STAND){
+      await notifyNews([],stand);
+      banner("Vroni hat den Atlas aktualisiert · Stand "+stand,"Neu laden",()=>location.reload());
+    }
+    return {neu:neu,stand:stand};
+  }catch(e){ return null; }
+  finally{ checking=false; }
+}
+/* ---- Service Worker (Offline + Hintergrund-Prüfung) ---- */
+let swReg=null;
+function sendState(){
+  if(!("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.ready.then(r=>{
+    if(r.active) r.active.postMessage({type:"state",cfg:cfg,seen:{titles:NEWS.map(x=>x.t),stand:STAND}});
+  }).catch(()=>{});
+}
+async function syncSetup(){
+  if(!swReg||!("periodicSync" in swReg)) return;
+  try{
+    if(cfg.on&&cfg.bg){
+      let st={state:"granted"};
+      try{ st=await navigator.permissions.query({name:"periodic-background-sync"}); }catch(e){}
+      if(st.state==="granted") await swReg.periodicSync.register("vroni-check",{minInterval:6*60*60*1000});
+    } else {
+      await swReg.periodicSync.unregister("vroni-check");
+    }
+  }catch(e){}
+}
+async function initSW(){
+  if(!("serviceWorker" in navigator)||!/^https?:$/.test(location.protocol)) return;
+  try{
+    swReg=await navigator.serviceWorker.register("sw.js");
+    sendState();
+    await syncSetup();
+  }catch(e){ swReg=null; }
+  refreshModal();
+}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.addEventListener("message",ev=>{
+    const d=ev.data||{};
+    if(d.type==="focus"){ showView("news"); }
+    if(d.type==="news"&&Array.isArray(d.items)&&d.items.length){
+      banner(d.items.length===1?"1 neuer Beitrag verfügbar":d.items.length+" neue Beiträge verfügbar","Neu laden",()=>location.reload());
+    }
+  });
+}
+/* ---- Einstellungs-Dialog ---- */
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const installed=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const notifySupported=(typeof Notification!=="undefined");
+const modalWrap=document.getElementById("modalwrap"), notifyBtn=document.getElementById("notifybtn");
+const nmOn=document.getElementById("nmon"), nmActs=document.getElementById("nmacts"),
+      nmBg=document.getElementById("nmbg"), nmQuiet=document.getElementById("nmquiet"),
+      nmStatus=document.getElementById("nmstatus"), nmCats=document.getElementById("nmcats"),
+      nmNote=document.getElementById("nmnote"), nmBgSd=document.getElementById("nmbgsd");
+NCAT_KEYS.forEach(k=>{
+  const row=document.createElement("div"); row.className="nrow";
+  const lab=document.createElement("label"); lab.setAttribute("for","nmc_"+k);
+  const cb=document.createElement("input"); cb.type="checkbox"; cb.id="nmc_"+k; cb.checked=cfg.cats[k]!==false;
+  const dot=document.createElement("span"); dot.className="cd"; dot.style.setProperty("--c",NCAT[k].c);
+  const tx=document.createElement("span"); tx.textContent=NCAT[k].n;
+  cb.addEventListener("change",()=>{ cfg.cats[k]=cb.checked; saveCfg(); });
+  lab.appendChild(cb); lab.appendChild(dot); lab.appendChild(tx);
+  row.appendChild(lab); nmCats.appendChild(row);
+});
+function bgSupported(){ return !!(swReg&&("periodicSync" in swReg)); }
+function note(t){ nmNote.textContent=t||""; }
+function refreshModal(){
+  nmOn.checked=!!cfg.on && notifySupported && Notification.permission==="granted";
+  nmActs.checked=cfg.acts!==false; nmBg.checked=cfg.bg!==false; nmQuiet.checked=cfg.quiet!==false;
+  nmBg.disabled=!bgSupported();
+  nmBgSd.textContent=bgSupported()
+    ? "Der Browser prüft frühestens alle 6 Stunden selbst – nur bei installierter App."
+    : "Auf diesem Gerät nicht verfügbar; Vroni prüft beim Öffnen der App.";
+  const l=[];
+  if(!notifySupported){
+    l.push(isIOS&&!installed
+      ? "<b>Noch nicht möglich:</b> Auf iPhone/iPad gehen Web-Hinweise nur aus der installierten App – in Safari <i>Teilen → Zum Home-Bildschirm</i>, danach die App von dort starten."
+      : "<b>Dieser Browser zeigt keine Systemhinweise.</b> Neue Beiträge markiert Vroni trotzdem in der App.");
+  } else if(Notification.permission==="granted"){
+    l.push("<b>Erlaubt</b> – Vroni darf Hinweise schicken.");
+  } else if(Notification.permission==="denied"){
+    l.push("<b>Blockiert</b> – Hinweise sind für diese Seite in den Browser-/Systemeinstellungen abgeschaltet.");
+  } else {
+    l.push("<b>Noch nicht erlaubt</b> – beim Aktivieren fragt das Gerät einmal nach.");
+  }
+  l.push(bgSupported()
+    ? "Hintergrund-Prüfung: möglich."
+    : "Hintergrund-Prüfung: hier nicht möglich. Ohne eigenen Push-Server (auf iOS/Safari generell) prüft Vroni immer dann, wenn du die App öffnest oder zurückholst – dann kommt der Hinweis auch in die Mitteilungszentrale.");
+  nmStatus.innerHTML=l.join("<br>");
+  notifyBtn.classList.toggle("on",nmOn.checked);
+  notifyBtn.setAttribute("aria-label",nmOn.checked?"Benachrichtigungen: aktiv":"Benachrichtigungen einstellen");
+}
+async function enableNotify(){
+  if(!notifySupported){ note("Dieser Browser kann keine Systemhinweise anzeigen."); return false; }
+  let p=Notification.permission;
+  if(p==="default"){ try{ p=await Notification.requestPermission(); }catch(e){ p=Notification.permission; } }
+  if(p!=="granted"){
+    cfg.on=false; saveCfg();
+    note("Ohne Erlaubnis des Geräts geht es nicht – du kannst sie in den Einstellungen später erteilen.");
+    return false;
+  }
+  cfg.on=true; saveCfg(); await syncSetup();
+  note("Aktiv. Probier gern den Test-Hinweis.");
+  return true;
+}
+function openNotifyModal(){ refreshModal(); note(""); modalWrap.classList.add("on"); }
+function closeNotifyModal(){ modalWrap.classList.remove("on"); }
+notifyBtn.addEventListener("click",openNotifyModal);
+document.getElementById("nmclose").addEventListener("click",closeNotifyModal);
+document.getElementById("nmdone").addEventListener("click",closeNotifyModal);
+modalWrap.addEventListener("click",e=>{ if(e.target===modalWrap) closeNotifyModal(); });
+nmOn.addEventListener("change",async()=>{
+  if(nmOn.checked){ await enableNotify(); }
+  else { cfg.on=false; saveCfg(); await syncSetup(); note("Aus. Neue Beiträge siehst du weiter in der App."); }
+  refreshModal();
+});
+nmActs.addEventListener("change",()=>{ cfg.acts=nmActs.checked; saveCfg(); });
+nmQuiet.addEventListener("change",()=>{ cfg.quiet=nmQuiet.checked; saveCfg(); });
+nmBg.addEventListener("change",async()=>{ cfg.bg=nmBg.checked; saveCfg(); await syncSetup(); });
+document.getElementById("nmtest").addEventListener("click",async()=>{
+  note("…");
+  if(!(await fire("Test von Vroni 🧸","So sieht ein Hinweis aus. Neue Beiträge melde ich genauso.","vroni-test")))
+    note(notifySupported&&Notification.permission==="granted"
+      ? "Der Hinweis konnte nicht angezeigt werden."
+      : "Erst oben aktivieren – dann funktioniert der Test.");
+  else note("Hinweis geschickt.");
+});
+document.getElementById("nmcheck").addEventListener("click",async()=>{
+  note("Suche nach Neuem …");
+  const r=await checkUpdates(true);
+  if(!r) note("Prüfung nicht möglich – bist du offline?");
+  else if(r.neu.length) note(r.neu.length+" neue Beiträge gefunden.");
+  else note("Alles aktuell"+(r.stand?" · Stand "+r.stand:"")+".");
+});
+/* ---- Prüfen: beim Öffnen, beim Zurückholen, und ab und zu währenddessen ---- */
+addEventListener("visibilitychange",()=>{ if(!document.hidden) checkUpdates(false); });
+setInterval(()=>{ if(!document.hidden) checkUpdates(false); },20*60*1000);
+showFreshUI();
+if(freshSet.size||standNew) notifyNews(NEWS.filter(x=>freshSet.has(x.t)),standNew?STAND:"");
+refreshModal();
+initSW();
+
 /* News rendern */
 const nlist=document.getElementById("nlist"), nfilter=document.getElementById("nfilter");
 let newsCat="alle";
@@ -1276,7 +1802,7 @@ function renderNews(){
     const c=NCAT[x.cat];
     const d=document.createElement("details"); d.className="ncard"; d.style.setProperty("--nc",c.c);
     d.innerHTML=`<summary>
-      <div class="ntop"><span class="ncat">${c.n}</span><span class="ndate">${x.d}</span></div>
+      <div class="ntop"><span class="ncat">${c.n}</span><span class="ndate">${x.d}</span>${freshShown.has(x.t)?`<span class="nnew">Neu</span>`:""}</div>
       <div class="nt">${x.t}</div>
       <div class="nsum">${x.s}</div>
       <span class="nmore"><span class="plus"></span></span>
@@ -1298,19 +1824,21 @@ cats2.forEach(([k,label])=>{
 renderNews();
 /* Tabs */
 var mapVisible=true;
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+function showView(v){
   document.querySelectorAll(".tab").forEach(x=>{
-    x.classList.toggle("on",x===t);
-    x.setAttribute("aria-pressed",x===t?"true":"false");
+    const on=(x.dataset.view===v);
+    x.classList.toggle("on",on);
+    x.setAttribute("aria-pressed",on?"true":"false");
   });
-  const v=t.dataset.view;
   mapVisible=(v==="map");
   document.getElementById("newsview").classList.toggle("on",!mapVisible);
   document.getElementById("wrap").style.visibility=mapVisible?"visible":"hidden";
   document.getElementById("zoomctl").style.display=mapVisible?"flex":"none";
   document.getElementById("hint").style.display=mapVisible?"":"none";
-  deselect(); tip.classList.remove("show");
-}));
+  if(!mapVisible) markSeen();          /* Briefing gelesen → NEU-Zähler zurücksetzen */
+  setSide(false); deselect(); tip.classList.remove("show");
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
 /* ================= HELL-/DUNKELMODUS =================
    Standard ist hell; die Auswahl wird in localStorage gemerkt.
    Alle Farben kommen aus den Tokens in :root – hier wird nur
@@ -1338,11 +1866,23 @@ themeBtn.addEventListener("click",toggleTheme);
 applyTheme(currentTheme(),false);
 /* Vroni-Toast */
 const toast=document.getElementById("toast");
+function hideToast(){ const t=document.getElementById("toast"); if(t) t.classList.remove("show"); }
 setTimeout(()=>toast.classList.add("show"),1100);
-setTimeout(()=>toast.classList.remove("show"),15000);
-document.getElementById("toastclose").addEventListener("click",()=>toast.classList.remove("show"));
+setTimeout(hideToast,15000);
+document.getElementById("toastclose").addEventListener("click",hideToast);
+/* Bedienhinweis auf Touch-Geräten nach kurzer Zeit ausblenden */
+if(matchMedia("(hover: none)").matches) setTimeout(()=>document.getElementById("hint").classList.add("gone"),9000);
 applyFilters();
-fitAll(false);
+/* Startansicht: am Desktop alles, auf kleinen Bildschirmen etwas näher dran –
+   sonst sind die Chips unlesbar klein. Gesamtansicht bleibt über ⌖ erreichbar. */
+(function startView(){
+  fitAll(false);
+  if(innerWidth<=900 && vb.w>900){
+    const cx=vb.x+vb.w/2, cy=vb.y+vb.h/2, f=900/vb.w;
+    vb={x:cx-450, y:cy-vb.h*f/2, w:900, h:vb.h*f}; applyVB();
+  }
+})();
+if(location.hash==="#briefing") showView("news");
 addEventListener("resize",()=>{});
 </script>
 </body>

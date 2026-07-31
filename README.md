@@ -12,12 +12,19 @@ Interaktive Wissenskarte des europäischen und deutschen Energierechts plus rege
 - **Status je Rechtsakt:** in Kraft · im Gesetzgebungsverfahren · Vorschlag/angekündigt · Programm/Strategie · kommend.
 - **~60 typisierte Verknüpfungen:** Umsetzung EU → DE (z. B. Strombinnenmarkt-RL → EnWG), Ändert/novelliert (z. B. EnWG-Novelle 2026 → EnWG), inhaltlicher Bezug.
 - **Detailansicht** pro Rechtsakt: Kurzbeschreibung, Kernpunkte, aktueller Verfahrensstand, Kennzahlen (Fristen, Ziele) und Links zu offiziellen Quellen (EUR-Lex, Bundestag, BMWE u. a.).
-- Suche (Shortcut `/`), Ebenen- und Themenfilter, Zoom/Pan, verschiebbare Knoten, responsives dunkles UI.
+- Suche (Shortcut `/`), Ebenen- und Themenfilter, Hell-/Dunkelmodus (Standard hell, Taste `T`).
+- **Bedienung mit Maus und Finger:** Rad bzw. Pinch = Zoom, Ziehen = Verschieben, Tippen/Klick = Details, Doppeltipp = näher ran, langes Drücken nimmt einen Knoten auf. Auf dem Handy startet die Ansicht in lesbarer Größe, die Gesamtansicht bleibt über ⌖ erreichbar.
 
 ### 📰 Vronis Energie-Briefing
 - Kuratierte News-Ansicht mit Meldungen zu Regulierung DE, Märkten & Preisen, Technologie, Wasserstoff, Netzen und EU-Politik.
 - Jede Meldung mit Datum, Detailpunkten, Quellenlinks und einer Einordnung **„Warum relevant“** (Fokus: VPP, Flexibilität, BHKW/KWK, Speicher).
 - Aktualisierungsrhythmus: **Mo · Mi · Fr**; jeden Montag zusätzlich Fakten-Check aller Gesetzesinfos.
+- Neue Beiträge sind mit **NEU** markiert, ein Banner zählt sie – die Karten selbst bleiben unverändert lesbar.
+
+### 🔔 Als App inkl. Benachrichtigungen
+- Über die Glocke in der Tab-Bar lässt sich einstellen, **worüber** (je Briefing-Thema, dazu Prüfungen der Wissenskarte) und **wann** (Hintergrund-Prüfung, Ruhezeit 22–7 Uhr) Vroni Bescheid gibt. Dazu gibt es einen Test-Hinweis und „Jetzt prüfen“.
+- Läuft die Seite als installierte App (iOS: *Teilen → Zum Home-Bildschirm*), meldet Vroni neue Beiträge per Systemhinweis. Auf Android/Chrome prüft der Service Worker (`sw.js`) zusätzlich periodisch im Hintergrund; auf iPhone/iPad ist das technisch nicht möglich – dort kommt der Hinweis, sobald die App geöffnet oder zurückgeholt wird. Echtes Web-Push (Hinweis ohne laufende App) bräuchte einen eigenen Push-Server; der Handler dafür liegt in `sw.js` schon bereit.
+- Dank Service Worker funktioniert die App auch offline.
 
 ## Technik & Datenmodell
 
@@ -34,6 +41,8 @@ Alles liegt in `index.html`:
 Auch Grafiken sind als Base64-Data-URIs eingebettet – die Datei funktioniert offline und auf jedem statischen Hosting.
 
 **App-Icon:** Für „Zum Home-Bildschirm“ (iPhone/iPad) und die Installation unter Android liegen zusätzlich `apple-touch-icon.png` (180×180), `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` und `manifest.json` neben `index.html` – iOS und Android akzeptieren für Homebildschirm-Icons keine eingebetteten Data-URIs. Das Favicon für den Browser-Tab steckt weiterhin inline in `index.html`. Wer die Seite auf ein anderes Hosting kopiert, sollte diese Dateien mitnehmen.
+
+**Service Worker:** `sw.js` (ebenfalls zwingend eine eigene Datei) übernimmt Offline-Cache und Benachrichtigungen. Fehlt sie, läuft die App normal – nur ohne Offline-Betrieb und ohne Hinweise. Einstellungen liegen im `localStorage` des Geräts, es werden keine Daten übertragen.
 
 ## Aktualisieren & Deployment
 
