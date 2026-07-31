@@ -16,12 +16,19 @@ Alle Inhalte liegen als JS-Konstanten im `<script>`-Block:
 | `EXTRA` | je Rechtsakt-Id optional `{kpi:[{v,l}], links:[{t,u}]}` für die Detailansicht |
 | `NCAT`, `NEWS` | Briefing-Kategorien und Meldungen `{d (Datum), cat, t (Titel), s (Zusammenfassung), det[], w (Warum relevant), src:[{t,u}]}` |
 
+## Hell-/Dunkelmodus (Design-Tokens)
+Die Seite hat beide Modi, **Standard ist hell**. Umgeschaltet wird über den Knopf in der Tab-Bar (`#themebtn`) oder die Taste `T`; die Wahl liegt in `localStorage` unter `vroni-theme`. Ein kleines Skript im `<head>` setzt `data-theme` vor dem ersten Rendern (kein Aufblitzen).
+
+- Alle Farben kommen aus CSS-Variablen: `:root` = Hellmodus, `:root[data-theme="dark"]` überschreibt für dunkel. **Keine festen Farbwerte in neuen Regeln** – stattdessen Tokens nutzen: Text `--ink`/`--ink2`/`--prose`, Flächen `--card`/`--card2`/`--f1`…`--f4`, Linien `--cardline`, Akzent `--accent`/`--link`/`--acc1`/`--acc2`, Schatten `--shadow*`, Netzgrafik `--node-*`/`--e-*`/`--p-*`.
+- Kategorie-/Statusfarben (`CATS`, `STATUS`, `NCAT`) gelten für beide Modi. Wo sie aus JS kommen, wird **nicht** direkt `background`/`fill` gesetzt, sondern die Custom Property `--c` (bzw. `--sc`, `--nc`); die eigentliche Füllung entsteht in CSS und wird im Hellmodus über `color-mix()` mit `--dotmix`/`--txtmix` abgedunkelt, damit Punkte und Chip-Texte auf Weiß lesbar bleiben. Jede `color-mix()`-Regel hat eine Rohfarbe als Fallback davor.
+
 ## Regeln beim Aktualisieren
 - Neuer Rechtsakt: Eintrag in `N` + passende Kanten in `E` (+ ggf. `EXTRA`). Neue Meldung: oben in `NEWS` einfügen.
 - **„Stand“-Datum an drei Stellen aktualisieren:** Fußzeile Sidebar (`.foot`), `#newsstamp` und `.tabstand`.
 - Quellen nur offiziell (EUR-Lex, Bundestag, BMWE, BNetzA o. ä.). Einordnung „Warum relevant“ aus Sicht VPP/Flexibilität/BHKW/Speicher.
 - Keine externen Ressourcen einbinden (kein CDN, keine Fonts von außen – die Datei muss offline funktionieren). Ausnahme sind die Icon-Dateien im selben Ordner; fehlen sie, greift das Inline-Favicon.
 - Icon ändern: alle vier PNGs neu erzeugen (gleiche Motiv-/Farbwelt: Hintergrund `#0b0e14`-Verlauf, Vroni, Knotenpunkte in den Themenfeld-Farben), Inline-Favicon in `index.html` mit ersetzen und `vroni-atlas-deploy.zip` neu packen.
+- Neue UI-Elemente in **beiden** Modi prüfen.
 
 ## Deployment & Sync
 - Push auf `main` ⇒ GitHub Pages veröffentlicht automatisch: https://haidarra82066.github.io/energiewirtschaft-updates/
