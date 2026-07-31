@@ -22,5 +22,8 @@ Alle Inhalte liegen als JS-Konstanten im `<script>`-Block:
 
 ## Deployment & Sync
 - Push auf `main` ⇒ GitHub Pages veröffentlicht automatisch: https://haidarra82066.github.io/energiewirtschaft-updates/
-- Lokale Arbeitskopie: `C:\Users\RamiHaidar\OneDrive\Projects\Energiewirtschaft Updates` (dort aktualisiert Vronis Routine die Datei direkt). Nach Cloud-Änderungen lokal zuerst `git pull`, vor lokalen Änderungen ebenfalls – GitHub ist die Quelle der Wahrheit.
+- Lokale Arbeitskopie: `C:\Users\RamiHaidar\OneDrive\Projects\Energiewirtschaft Updates`. Nach Cloud-Änderungen lokal zuerst `git pull`, vor lokalen Änderungen ebenfalls – GitHub ist die Quelle der Wahrheit.
 - Details: siehe DEPLOY-ANLEITUNG.md
+
+## Automatische Pflege
+Vronis Routinen laufen als Claude-Code-Cloud-Agenten gegen dieses Repo (Fakten-Check Mo, Briefing Mo/Mi/Fr) und pushen selbst auf `main`. Prompts und Zeitpläne: `.claude/routines/` – siehe [.claude/routines/README.md](.claude/routines/README.md).
