@@ -172,7 +172,13 @@
   }
   .cat:hover{background:var(--f2);}
   .cat .dot{width:9px;height:9px;border-radius:50%;color:var(--c);box-shadow:0 0 8px 0 currentColor;}
-  .cat .cnt{margin-left:auto;font-size:11px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+  .cat .cnt{margin-left:6px;font-size:11px;color:var(--ink2);font-variant-numeric:tabular-nums;}
+  .cat .goto{
+    margin-left:auto;background:none;border:none;padding:0 2px;line-height:1;cursor:pointer;
+    color:var(--ink2);font-size:13px;font-family:inherit;opacity:0;transition:opacity .15s,color .15s;
+  }
+  .cat:hover .goto,.cat .goto:focus-visible{opacity:.75;}
+  .cat .goto:hover{color:var(--ink);opacity:1;}
   .cat.off{opacity:.38;}
   .cat.off .dot{box-shadow:none;background:var(--ink2)!important;}
   #resetbtn{
@@ -272,6 +278,32 @@
   .edge.hl.umsetzung{stroke:var(--e-uh);stroke-width:2.4;}
   .edge.hl.aenderung{stroke:var(--e-ah);stroke-width:2.1;}
   .edge.hl.bezug{stroke:var(--e-bh);stroke-width:1.7;}
+  /* ---------- Themenfeld-Flächen ---------- */
+  /* Jedes Themenfeld bekommt eine weiche Fläche mit Namen – das ist die Gliederung,
+     die man aus der Vollansicht sieht, wenn die einzelnen Chips zu klein sind. */
+  .hull{
+    fill:var(--c);fill:color-mix(in srgb, var(--c) 9%, transparent);
+    stroke:var(--c);stroke-opacity:.24;stroke-width:1.6;stroke-linejoin:round;
+    pointer-events:none;transition:opacity .3s;
+  }
+  .hulll{
+    fill:var(--c);fill:color-mix(in srgb, var(--c) var(--txtmix), var(--basemix));
+    font-size:var(--hls,34px);font-weight:800;letter-spacing:-.015em;text-anchor:middle;
+    cursor:pointer;opacity:.9;transition:opacity .3s;
+  }
+  .hulll:hover{opacity:1;}
+  .hulln{
+    fill:var(--ink2);font-size:calc(var(--hls,34px) * .5);font-weight:600;text-anchor:middle;
+    pointer-events:none;opacity:.65;transition:opacity .3s;
+  }
+  .hullg.off{display:none;}
+  /* Zoomstufen: von weitem zählen die Themenfelder, aus der Nähe die einzelnen Einträge. */
+  .node .nm,.node .lvlt,.node .sdot2{transition:opacity .25s;}
+  .lod-far .node .nm,.lod-far .node .lvlt,.lod-far .node .sdot2{opacity:0;}
+  .lod-far .node .body{opacity:.45;}
+  .lod-far .edge.bezug{opacity:0;}
+  .lod-near .hulll,.lod-near .hulln{opacity:0;pointer-events:none;}
+  .lod-near .hull{opacity:.45;}
   .pulse{pointer-events:none;filter:drop-shadow(0 0 4px currentColor);}
   .pulse.umsetzung{fill:var(--p-u);color:var(--p-u);}
   .pulse.aenderung{fill:var(--p-a);color:var(--p-a);}
@@ -587,7 +619,7 @@
   <button class="zbtn" id="zout" title="Verkleinern">−</button>
   <button class="zbtn" id="zfit" title="Gesamtansicht" style="font-size:13px">⌖</button>
 </div>
-<div id="hint"><span class="desk">Klick = Details · Ziehen = Verschieben · Scrollen = Zoom · Knoten sind verschiebbar</span><span class="mob">Ziehen = Verschieben · 2 Finger = Zoom · Tippen = Details</span></div>
+<div id="hint"><span class="desk">Themenfeld anklicken = hineinzoomen · Klick = Details · Ziehen = Verschieben · Scrollen = Zoom</span><span class="mob">Themenfeld antippen = hineinzoomen · 2 Finger = Zoom · Tippen = Details</span></div>
 
 <div id="panel"><div id="pbar"></div><button id="close">✕</button><div id="pscroll"><div id="pcontent"></div></div></div>
 
@@ -629,19 +661,21 @@
 <script>
 "use strict";
 /* ================= DATEN ================= */
+/* `s` ist die Kurzform für die Beschriftung auf der Karte – die Langform würde
+   dort über die Nachbarfelder laufen. */
 const CATS = {
-  klima:  {n:"Klima & Rahmen",              c:"#34d399"},
-  strom:  {n:"Strommarkt & Versorgung",     c:"#5b9dff"},
-  ee:     {n:"Erneuerbare Energien",        c:"#a3e635"},
-  netz:   {n:"Netze & Infrastruktur",       c:"#f5a524"},
-  gas:    {n:"Gas & Wasserstoff",           c:"#a78bfa"},
-  waerme: {n:"Wärme & Gebäude",             c:"#fb7185"},
-  eff:    {n:"Energieeffizienz",            c:"#2dd4bf"},
-  co2:    {n:"CO₂-Preis, Industrie & Steuern", c:"#eab308"},
-  nachhalt:{n:"Nachhaltigkeit & Berichtspflichten", c:"#e879f9"},
-  rohstoff:{n:"Rohstoffe & Kreislaufwirtschaft",    c:"#f97316"},
-  mako:   {n:"Marktprozesse, IT & Technik", c:"#22d3ee"},
-  genehm: {n:"Anlagen & Genehmigung",       c:"#94a3b8"}
+  klima:  {n:"Klima & Rahmen",              s:"Klima",          c:"#34d399"},
+  strom:  {n:"Strommarkt & Versorgung",     s:"Strommarkt",     c:"#5b9dff"},
+  ee:     {n:"Erneuerbare Energien",        s:"Erneuerbare",    c:"#a3e635"},
+  netz:   {n:"Netze & Infrastruktur",       s:"Netze",          c:"#f5a524"},
+  gas:    {n:"Gas & Wasserstoff",           s:"Gas & H₂",       c:"#a78bfa"},
+  waerme: {n:"Wärme & Gebäude",             s:"Wärme",          c:"#fb7185"},
+  eff:    {n:"Energieeffizienz",            s:"Effizienz",      c:"#2dd4bf"},
+  co2:    {n:"CO₂-Preis, Industrie & Steuern", s:"CO₂ & Steuern", c:"#eab308"},
+  nachhalt:{n:"Nachhaltigkeit & Berichtspflichten", s:"Nachhaltigkeit", c:"#e879f9"},
+  rohstoff:{n:"Rohstoffe & Kreislaufwirtschaft",    s:"Rohstoffe",      c:"#f97316"},
+  mako:   {n:"Marktprozesse, IT & Technik", s:"Marktprozesse",  c:"#22d3ee"},
+  genehm: {n:"Anlagen & Genehmigung",       s:"Genehmigung",    c:"#94a3b8"}
 };
 /* Art des Eintrags – „recht“ ist der Standard und wird in N nicht ausgeschrieben. */
 const ARTS = {
@@ -1455,16 +1489,36 @@ document.getElementById("chipcount").textContent = N.length+" Einträge · "+E.l
 
 /* ---- Force-Layout (neuronale Anordnung) ---- */
 const catOrder=["klima","strom","ee","netz","gas","waerme","eff","co2","nachhalt","rohstoff","mako","genehm"];
+/* Reihenfolge auf dem Ring – anders als in der Seitenleiste, hier liegen verwandte
+   Themenfelder nebeneinander, damit die Kanten kurz bleiben. */
+const ringOrder=["klima","co2","rohstoff","genehm","waerme","eff","ee","gas","netz","mako","strom","nachhalt"];
+/* Fester Zufallsstrom statt Math.random(): Die Karte sieht bei jedem Aufruf gleich aus,
+   damit man sich merken kann, wo ein Themenfeld liegt. Nur das Layout ist gebunden –
+   die Leucht- und Pulsanimationen dürfen weiter frei würfeln. */
+let _seed=20260802;
+function rnd(){ _seed=(_seed*1664525+1013904223)>>>0; return _seed/4294967296; }
+const catCount={}; catOrder.forEach(c=>catCount[c]=N.filter(n=>n.cat===c).length);
 const anchors={};
-/* Ring-Radius wächst mit der Zahl der Themenfelder, sonst klebt alles aufeinander. */
-const RX=Math.max(560, catOrder.length*88), RY=Math.max(420, catOrder.length*66);
-catOrder.forEach((c,i)=>{
-  const a=-Math.PI/2 + i*(2*Math.PI/catOrder.length);
-  anchors[c]={x:Math.cos(a)*RX, y:Math.sin(a)*RY};
-});
+/* Ring wächst mit der Zahl der Einträge; jedes Themenfeld bekommt einen Bogen
+   nach seiner Größe, sonst drängen die großen Cluster in die kleinen hinein. */
+/* Bewusst eng gewählt – die Cluster-Trennung weiter unten schiebt auf den nötigen
+   Abstand auf. Ein großzügiger Ring würde nur ein leeres Loch in der Mitte lassen.
+   Auf Hochkant-Bildschirmen wird der Ring hochkant gestellt, sonst bleibt oben und
+   unten die halbe Anzeige leer. */
+const PORTRAIT = innerHeight > innerWidth*1.25;
+const RX=Math.max(520, Math.sqrt(N.length)*84) * (PORTRAIT?0.78:1), RY=RX*(PORTRAIT?1.85:0.72);
+(function(){
+  const w=ringOrder.map(c=>Math.sqrt(catCount[c]||1));
+  const tot=w.reduce((a,b)=>a+b,0); let acc=0;
+  ringOrder.forEach((c,i)=>{
+    const share=w[i]/tot;
+    const a=-Math.PI/2 + (acc+share/2)*2*Math.PI; acc+=share;
+    anchors[c]={x:Math.cos(a)*RX, y:Math.sin(a)*RY};
+  });
+})();
 N.forEach((n,i)=>{
-  const a=anchors[n.cat], j=i*2.399;
-  n.x=a.x+Math.cos(j)*150*Math.random(); n.y=a.y+Math.sin(j)*150*Math.random();
+  const a=anchors[n.cat], j=i*2.399, rr=40+Math.sqrt(catCount[n.cat])*34;
+  n.x=a.x+Math.cos(j)*rr*rnd(); n.y=a.y+Math.sin(j)*rr*rnd();
 });
 (function simulate(){
   const ITER=850;
@@ -1474,25 +1528,49 @@ N.forEach((n,i)=>{
     for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){
       const a=N[i],b=N[j];
       let dx=a.x-b.x, dy=a.y-b.y; let d2=dx*dx+dy*dy;
-      if(d2<1){dx=Math.random()-0.5;dy=Math.random()-0.5;d2=1;}
+      if(d2<1){dx=rnd()-0.5;dy=rnd()-0.5;d2=1;}
       const f=13000/d2;
       const d=Math.sqrt(d2); dx/=d; dy/=d;
       a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f;
     }
     for(const e of E){
       const a=nodeMap[e[0]], b=nodeMap[e[1]];
-      const L=(a.cat===b.cat)?155:330;
+      const same=a.cat===b.cat;
+      const L=same?150:420;
       let dx=b.x-a.x, dy=b.y-a.y; const d=Math.max(Math.sqrt(dx*dx+dy*dy),1);
-      const f=(d-L)*0.016; dx/=d; dy/=d;
+      /* Kanten über Themenfeldgrenzen ziehen nur schwach – sonst reißen sie die Cluster auf. */
+      const f=(d-L)*(same?0.020:0.005); dx/=d; dy/=d;
       a.vx+=dx*f; a.vy+=dy*f;
       b.vx-=dx*f; b.vy-=dy*f;
     }
     for(const n of N){
       const a=anchors[n.cat];
-      n.vx+=(a.x-n.x)*0.028; n.vy+=(a.y-n.y)*0.028;
-      if(n.lvl==="EU"){ n.vx+=(0-n.x)*0.006; n.vy+=(0-n.y)*0.006; }
+      n.vx+=(a.x-n.x)*0.055; n.vy+=(a.y-n.y)*0.055;
+      if(n.lvl==="EU"){ n.vx+=(0-n.x)*0.004; n.vy+=(0-n.y)*0.004; }
       n.x+=n.vx*cool; n.y+=n.vy*cool;
     }
+  }
+  /* Cluster als Ganzes auseinanderschieben, damit sich die Themenfeld-Flächen nicht überlappen */
+  for(let k=0;k<240;k++){
+    const cl=[];
+    for(const c of ringOrder){
+      const m=N.filter(n=>n.cat===c); if(!m.length)continue;
+      let cx=0,cy=0; m.forEach(n=>{cx+=n.x;cy+=n.y;}); cx/=m.length; cy/=m.length;
+      let r=0; m.forEach(n=>{ r=Math.max(r, Math.hypot(n.x-cx,n.y-cy)+n.w/2); });
+      cl.push({m,cx,cy,r});
+    }
+    let moved=false;
+    for(let i=0;i<cl.length;i++)for(let j=i+1;j<cl.length;j++){
+      const a=cl[i], b=cl[j];
+      let dx=b.cx-a.cx, dy=b.cy-a.cy; const d=Math.hypot(dx,dy)||0.01;
+      const min=a.r+b.r+132;
+      if(d<min){
+        const push=(min-d)/2; dx/=d; dy/=d; moved=true;
+        a.m.forEach(n=>{n.x-=dx*push;n.y-=dy*push;}); a.cx-=dx*push; a.cy-=dy*push;
+        b.m.forEach(n=>{n.x+=dx*push;n.y+=dy*push;}); b.cx+=dx*push; b.cy+=dy*push;
+      }
+    }
+    if(!moved)break;
   }
   /* Überlappungen auflösen (Platz für Labels) */
   for(let k=0;k<520;k++){
@@ -1515,7 +1593,7 @@ function el(t,a,parent){const e=document.createElementNS(NSvg,t);for(const k in 
 const defs=el("defs",{},svg);
 /* Chips brauchen keine Gradients – Look kommt aus CSS (Glow via drop-shadow) */
 const root=el("g",{},svg);
-const gEdges=el("g",{},root), gPulses=el("g",{},root), gNodes=el("g",{},root);
+const gHulls=el("g",{},root), gEdges=el("g",{},root), gPulses=el("g",{},root), gNodes=el("g",{},root);
 
 /* Kanten */
 const edges=E.map((e,i)=>{
@@ -1561,6 +1639,93 @@ N.forEach(n=>{
   g.addEventListener("pointerenter",()=>hover(n.id,true));
   g.addEventListener("pointerleave",()=>hover(n.id,false));
 });
+/* ---- Themenfeld-Flächen ---- */
+/* Konvexe Hülle um die sichtbaren Knoten eines Themenfelds, an den Ecken abgerundet.
+   Sie macht die Gliederung sichtbar, wenn die einzelnen Chips zu klein zum Lesen sind. */
+function convexHull(pts){
+  const p=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
+  if(p.length<3)return p;
+  const cross=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lo=[],up=[];
+  for(const q of p){ while(lo.length>=2&&cross(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop(); lo.push(q); }
+  for(let i=p.length-1;i>=0;i--){ const q=p[i]; while(up.length>=2&&cross(up[up.length-2],up[up.length-1],q)<=0)up.pop(); up.push(q); }
+  lo.pop(); up.pop(); return lo.concat(up);
+}
+function blobPath(pts,pad){
+  let cx=0,cy=0; pts.forEach(p=>{cx+=p.x;cy+=p.y;}); cx/=pts.length; cy/=pts.length;
+  let h=convexHull(pts);
+  if(h.length<3){
+    const r=Math.max(...pts.map(p=>Math.hypot(p.x-cx,p.y-cy)))+pad;
+    return `M${cx-r},${cy} a${r},${r} 0 1,0 ${2*r},0 a${r},${r} 0 1,0 ${-2*r},0Z`;
+  }
+  h=h.map(p=>{ const dx=p.x-cx, dy=p.y-cy, d=Math.hypot(dx,dy)||1;
+               return {x:p.x+dx/d*pad, y:p.y+dy/d*pad}; });
+  const mid=(a,b)=>({x:(a.x+b.x)/2, y:(a.y+b.y)/2});
+  const m0=mid(h[h.length-1],h[0]);
+  let d=`M${m0.x},${m0.y}`;
+  for(let i=0;i<h.length;i++){ const cur=h[i], m=mid(cur,h[(i+1)%h.length]);
+    d+=` Q${cur.x},${cur.y} ${m.x},${m.y}`; }
+  return d+"Z";
+}
+const hullEls={};
+catOrder.forEach(c=>{
+  const g=el("g",{class:"hullg","data-cat":c},gHulls);
+  g.style.setProperty("--c",CATS[c].c);
+  const path=el("path",{class:"hull",d:""},g);
+  const lab=el("text",{class:"hulll",x:0,y:0},g); lab.textContent=CATS[c].s;
+  el("title",{},lab).textContent=CATS[c].n;
+  const cnt=el("text",{class:"hulln",x:0,y:0},g);
+  lab.addEventListener("click",()=>flyToCat(c));
+  hullEls[c]={g,path,lab,cnt,box:null};
+});
+function drawHulls(){
+  catOrder.forEach(c=>{
+    const h=hullEls[c], pts=[]; let num=0;
+    N.forEach(n=>{
+      if(n.cat!==c || nodeEls[n.id].style.display==="none")return;
+      num++;
+      const x=n.x+n.ox, y=n.y+n.oy, hw=n.w/2+6, hh=n.h/2+6;
+      pts.push({x:x-hw,y:y-hh},{x:x+hw,y:y-hh},{x:x+hw,y:y+hh},{x:x-hw,y:y+hh});
+    });
+    h.g.classList.toggle("off",!num);
+    if(!num){ h.box=null; return; }
+    h.path.setAttribute("d", blobPath(pts,22));
+    h.cnt.textContent = num===1 ? "1 Eintrag" : num+" Einträge";
+    let x0=1e9,y0=1e9,x1=-1e9;
+    pts.forEach(p=>{x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);});
+    h.box={cx:(x0+x1)/2, y0:y0-22};
+  });
+  placeHullLabels();
+}
+/* Beschriftungsgröße in Weltkoordinaten so wählen, dass sie auf dem Schirm immer
+   gleich groß ankommt – sonst ist sie am Telefon winzig und am Desktop riesig. */
+let svgW=1, svgH=1;
+function measureSvg(){ const r=svg.getBoundingClientRect(); svgW=r.width||1; svgH=r.height||1; }
+function labelFS(w,h){
+  const sc=Math.min(svgW/w, svgH/h)||1;
+  return Math.max(13, Math.min(20, svgW/58))/sc;
+}
+function placeHullLabels(){
+  const fs=labelFS(vb.w,vb.h);
+  catOrder.forEach(c=>{
+    const h=hullEls[c]; if(!h.box)return;
+    h.lab.setAttribute("x",h.box.cx); h.lab.setAttribute("y",h.box.y0-fs*0.95);
+    h.cnt.setAttribute("x",h.box.cx); h.cnt.setAttribute("y",h.box.y0-fs*0.2);
+  });
+}
+/* Auf ein Themenfeld zoomen – über die Beschriftung oder das Fadenkreuz in der Seitenleiste. */
+function flyToCat(c){
+  let list=N.filter(n=>n.cat===c&&nodeEls[n.id].style.display!=="none");
+  if(!list.length) list=N.filter(n=>n.cat===c);
+  if(!list.length)return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  list.forEach(n=>{ x0=Math.min(x0,n.x-n.w/2-70); y0=Math.min(y0,n.y-70);
+                    x1=Math.max(x1,n.x+n.w/2+70); y1=Math.max(y1,n.y+80); });
+  /* oben Platz für die Themenfeld-Beschriftung und die Tab-Leiste */
+  y0-=labelFS(x1-x0, y1-y0)*4.2;
+  tweenVB({x:x0,y:y0,w:x1-x0,h:y1-y0});
+}
+
 /* ---- ViewBox / Pan / Zoom ---- */
 let vb={x:0,y:0,w:100,h:100};
 /* Ausdehnung des Netzes → daraus die Zoom-Grenzen (gilt für Rad, Knöpfe und Pinch) */
@@ -1582,10 +1747,31 @@ function fitAll(animate){
   N.forEach(n=>{ if(nodeEls[n.id].style.display==="none")return;
     x0=Math.min(x0,n.x-n.w/2-46); y0=Math.min(y0,n.y-60); x1=Math.max(x1,n.x+n.w/2+46); y1=Math.max(y1,n.y+60);});
   if(x0>x1){x0=-600;y0=-450;x1=600;y1=450;}
+  /* Platz für die Themenfeld-Beschriftungen mitrechnen. Zwei Durchläufe, weil ihre
+     Größe von der Weite des Ausschnitts abhängt, den wir gerade bestimmen. */
+  for(let k=0;k<2;k++){
+    const fs=labelFS(x1-x0, y1-y0);
+    catOrder.forEach(c=>{
+      const b=hullEls[c].box; if(!b)return;
+      const hw=CATS[c].s.length*0.30*fs;
+      y0=Math.min(y0, b.y0-fs*2.2);
+      x0=Math.min(x0, b.cx-hw); x1=Math.max(x1, b.cx+hw);
+    });
+  }
+  /* Etwas Luft zum Rand, damit Tab-Leiste und Bedienhinweis nichts überdecken */
+  const px=(x1-x0)*0.035, py=(y1-y0)*0.08;
+  x0-=px; x1+=px; y0-=py; y1+=py;
   const t={x:x0,y:y0,w:x1-x0,h:y1-y0};
   animate?tweenVB(t):(vb=t,applyVB());
 }
-function applyVB(){svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
+function applyVB(){
+  svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  /* Zoomstufe: weit = Themenfelder lesen, nah = Einträge lesen */
+  root.classList.toggle("lod-far", vb.w>1750);
+  root.classList.toggle("lod-near", vb.w<820);
+  gHulls.style.setProperty("--hls",labelFS(vb.w,vb.h)+"px");
+  placeHullLabels();
+}
 let tw=null;
 function tweenVB(t){
   const s={...vb}; const t0=performance.now(); cancelAnimationFrame(tw);
@@ -1733,6 +1919,7 @@ function animate(now){
     ed.pulse.setAttribute("cx",px); ed.pulse.setAttribute("cy",py);
     ed.pulse.setAttribute("opacity", ed.dimF?0 : (ed.hlF?0.95 : (ed.type==="bezug"?0.25:0.5)));
   }
+  if(dragging) drawHulls();   /* gezogener Knoten verformt seine Themenfeld-Fläche mit */
   frame++;
   requestAnimationFrame(animate);
 }
@@ -1849,7 +2036,9 @@ const catsDiv=document.getElementById("cats");
 catOrder.forEach(c=>{
   const cnt=N.filter(n=>n.cat===c).length;
   const d=document.createElement("div"); d.className="cat"; d.dataset.cat=c;
-  d.innerHTML=`<span class="dot" style="--c:${CATS[c].c}"></span>${CATS[c].n}<span class="cnt">${cnt}</span>`;
+  d.innerHTML=`<span class="dot" style="--c:${CATS[c].c}"></span>${CATS[c].n}<button class="goto" type="button" title="Auf dieses Themenfeld zoomen" aria-label="Auf ${CATS[c].n} zoomen">⌖</button><span class="cnt">${cnt}</span>`;
+  d.querySelector(".goto").addEventListener("click",e=>{ e.stopPropagation(); flyToCat(c);
+    if(innerWidth<=900) setSide(false); });
   d.addEventListener("click",()=>{ activeCats.has(c)?activeCats.delete(c):activeCats.add(c);
     d.classList.toggle("off",!activeCats.has(c)); applyFilters(); });
   d.addEventListener("pointerenter",()=>{ if(selId)return;
@@ -1912,6 +2101,7 @@ function applyFilters(){
     ed.pulse.style.display=vis?"":"none";
     ed.hidden=!vis;
   });
+  drawHulls();   /* Flächen legen sich um das, was übrig bleibt */
 }
 /* ================= KENNZAHLEN & OFFIZIELLE DOKUMENTE ================= */
 const EXTRA={
@@ -2407,17 +2597,13 @@ document.getElementById("toastclose").addEventListener("click",hideToast);
 /* Bedienhinweis auf Touch-Geräten nach kurzer Zeit ausblenden */
 if(matchMedia("(hover: none)").matches) setTimeout(()=>document.getElementById("hint").classList.add("gone"),9000);
 applyFilters();
-/* Startansicht: am Desktop alles, auf kleinen Bildschirmen etwas näher dran –
-   sonst sind die Chips unlesbar klein. Gesamtansicht bleibt über ⌖ erreichbar. */
-(function startView(){
-  fitAll(false);
-  if(innerWidth<=900 && vb.w>900){
-    const cx=vb.x+vb.w/2, cy=vb.y+vb.h/2, f=900/vb.w;
-    vb={x:cx-450, y:cy-vb.h*f/2, w:900, h:vb.h*f}; applyVB();
-  }
-})();
+/* Startansicht: überall die Gesamtkarte. Aus der Ferne liest man die Themenfelder,
+   nicht die einzelnen Chips – über die Beschriftung oder das ⌖ in der Seitenleiste
+   geht es in ein Feld hinein. */
+measureSvg();
+fitAll(false);
+addEventListener("resize",()=>{ measureSvg(); applyVB(); });
 if(location.hash==="#briefing") showView("news");
-addEventListener("resize",()=>{});
 </script>
 </body>
 </html>

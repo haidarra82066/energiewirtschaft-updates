@@ -42,7 +42,17 @@ Die Karte (`svg#net`) läuft über Pointer-Events, `touch-action:none` hält den
 
 - **Maus:** Knoten direkt ziehen, Rad = Zoom, Ziehen auf leerer Fläche = Verschieben.
 - **Finger:** ein Finger verschiebt immer die Karte (auch wenn er auf einem Knoten startet), zwei Finger = Pinch-Zoom + Verschieben, Tippen = Details, Doppeltipp = näher ran, langes Drücken (420 ms) nimmt einen Knoten auf (`.node.grabbed`).
-- Zoom ist auf `ZMIN`/`ZMAX` begrenzt (aus der Netz-Ausdehnung `WORLD` berechnet); jeder Zoomweg läuft über `clampF()`. Auf schmalen Bildschirmen startet die Ansicht nicht ganz herausgezoomt, sonst sind die Chips unlesbar.
+- Zoom ist auf `ZMIN`/`ZMAX` begrenzt (aus der Netz-Ausdehnung `WORLD` berechnet); jeder Zoomweg läuft über `clampF()`. Gestartet wird überall mit der Gesamtkarte.
+
+## Gliederung der Karte
+Bei 120 Einträgen ist eine freie Wolke unlesbar. Die Karte ist deshalb in Themenfeld-Cluster gegliedert:
+
+- **Anordnung:** `ringOrder` legt fest, welche Themenfelder auf dem Ring nebeneinander liegen (verwandte zusammen – bewusst eine andere Reihenfolge als `catOrder`, das nur die Seitenleiste sortiert). Jedes Feld bekommt einen Bogen nach seiner Größe. Nach dem Kräfte-Layout schiebt eine Cluster-Trennung ganze Themenfelder auseinander, danach löst der bekannte Durchlauf die Überlappung einzelner Chips.
+- **Fester Zufall:** `rnd()` ersetzt `Math.random()` im Layout, damit die Karte bei jedem Aufruf gleich aussieht. Die Puls- und Schwebeanimationen dürfen weiter frei würfeln.
+- **Themenfeld-Flächen:** `drawHulls()` legt eine abgerundete konvexe Hülle um die **sichtbaren** Knoten eines Felds und beschriftet sie mit `CATS[c].s` (Kurzform – die Langform würde über die Nachbarn laufen). Neu berechnet wird sie beim Filtern und während eines Drags.
+- **Zoomstufen:** `applyVB()` setzt `lod-far` (> 1750) bzw. `lod-near` (< 820) auf die Wurzelgruppe. Von weitem treten die Themenfelder hervor und die Chip-Beschriftung verschwindet, aus der Nähe umgekehrt. Die Größe der Feldbeschriftung kommt aus `labelFS()` und ist auf dem Schirm immer gleich – nicht in ViewBox-Einheiten rechnen.
+- **Navigation:** `flyToCat()` zoomt auf ein Themenfeld, erreichbar über die Beschriftung auf der Karte und das ⌖ in der Seitenleiste.
+- **Hochkant:** Ist der Bildschirm deutlich höher als breit (`PORTRAIT`), wird der Ring hochkant gestellt, sonst bleibt oben und unten die halbe Anzeige leer.
 
 ## Mobiles Layout (≤ 900 px)
 Im Media-Query stehen `--top`/`--bot` (Safe-Area von Notch bzw. Home-Indikator). **Alle schwebenden Elemente hängen daran**, damit sich nichts überlappt: oben Menü-Knopf + Tab-Bar (einzeilig durch Kurz-Labels `.kurz`), direkt darunter Bedienhinweis bzw. Update-Banner, unten rechts die Zoom-Knöpfe, darüber der Vroni-Toast. Bei offener Sidebar (`body.sideopen`) werden Tab-Bar, Menü, Zoom, Hinweis und Toast ausgeblendet und ein `#scrim` legt sich über die Karte. Neue schwebende Elemente bitte in dieses Raster einsortieren und in beiden Modi prüfen.
