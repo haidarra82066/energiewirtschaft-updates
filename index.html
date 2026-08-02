@@ -157,9 +157,12 @@
   .sect{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);opacity:.75;margin:18px 2px 8px;}
   .lvlrow{display:flex;gap:8px;}
   .lvl{
-    flex:1;text-align:center;padding:7px 0;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;
+    flex:1;min-width:0;text-align:center;padding:7px 2px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;
     background:var(--f1);color:var(--ink2);border:1px solid transparent;transition:all .2s;user-select:none;
+    white-space:nowrap;
   }
+  /* Art-Knöpfe tragen längere Wörter als die Ebenen-Kürzel – eine Spur kleiner, damit nichts umbricht. */
+  .lvlrow.art .lvl{font-size:11px;letter-spacing:-.01em;}
   .lvl:hover{background:var(--f2);color:var(--ink);}
   .lvl.on{background:var(--f3);color:var(--ink);border-color:var(--cardline);box-shadow:var(--shadow-sm);}
   #cats{display:flex;flex-direction:column;gap:2px;}
@@ -229,7 +232,7 @@
   #close:hover{background:var(--f4);color:var(--ink);}
   #panel h2{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.25;padding-right:30px;}
   #panel .full{color:var(--ink2);font-size:12.5px;margin:5px 0 14px;line-height:1.45;}
-  .tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:8px;margin-bottom:16px;}
   .tile{border-radius:14px;padding:10px 8px;text-align:center;background:var(--card2);}
   .tile.tinted{background:color-mix(in srgb, var(--c) 13%, transparent);}
   .tile b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em;}
@@ -334,6 +337,7 @@
     color:var(--c);color:color-mix(in srgb, var(--c) var(--txtmix), var(--basemix));}
   #tip .tb.lvl-eu{--c:var(--strom);}
   #tip .tb.lvl-de{--c:var(--waerme);}
+  #tip .tb.lvl-int{--c:var(--eff);}
   #tip .td{font-size:11.5px;color:var(--prose);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   #tip .tk{display:flex;gap:8px;margin-top:9px;}
   #tip .tkk{flex:1;background:var(--card2);border-radius:10px;padding:7px 8px;text-align:center;}
@@ -526,8 +530,15 @@
   <div id="results"></div>
   <div class="sect">Ebene</div>
   <div class="lvlrow">
-    <div class="lvl on" data-lvl="EU">🇪🇺 EU</div>
-    <div class="lvl on" data-lvl="DE">🇩🇪 Deutschland</div>
+    <div class="lvl on" data-lvl="EU" title="EU-Ebene">🇪🇺 EU</div>
+    <div class="lvl on" data-lvl="DE" title="Deutschland">🇩🇪 DE</div>
+    <div class="lvl on" data-lvl="INT" title="International / privatrechtlich">🌐 Int.</div>
+  </div>
+  <div class="sect">Art</div>
+  <div class="lvlrow art">
+    <div class="lvl on" data-art="recht" title="Gesetze, Verordnungen, Richtlinien">⚖️ Recht</div>
+    <div class="lvl on" data-art="foerd" title="Förderprogramme und Entlastungen">💶 Förderung</div>
+    <div class="lvl on" data-art="std" title="Standards, Normen und technische Regelwerke">📐 Standard</div>
   </div>
   <div class="sect">Themenfelder</div>
   <div id="cats"></div>
@@ -544,7 +555,7 @@
       <span class="sitem"><span class="sdot" style="--c:var(--pg)"></span>Programm</span>
     </div>
   </div>
-  <div class="foot">🧸 <b>Vronis Pflege-Routine:</b> Jeden Montag prüft Vroni alle Gesetzesinfos auf Aktualität; das Energie-Briefing wird Mo/Mi/Fr aktualisiert.<br><br>Stand 31.07.2026 · Angaben ohne Gewähr, keine Rechtsberatung. Offizielle Quellen in jeder Detailansicht.</div>
+  <div class="foot">🧸 <b>Vronis Pflege-Routine:</b> Jeden Montag prüft Vroni alle Gesetzesinfos auf Aktualität; das Energie-Briefing wird Mo/Mi/Fr aktualisiert.<br><br>Stand 02.08.2026 · Angaben ohne Gewähr, keine Rechtsberatung. Offizielle Quellen in jeder Detailansicht.</div>
 </aside>
 
 <div id="wrap"><svg id="net"></svg></div>
@@ -559,7 +570,7 @@
 <div id="tabs">
   <button class="tab on" data-view="map" aria-pressed="true" aria-label="Wissenskarte">🧠 <span class="lang">Wissenskarte</span><span class="kurz">Karte</span></button>
   <button class="tab" data-view="news" aria-pressed="false" aria-label="Energie-Briefing">📰 <span class="lang">Energie-Briefing</span><span class="kurz">Briefing</span><span class="ndot"></span></button>
-  <span class="tabstand"><span class="live"></span>Stand: 31.07.2026</span>
+  <span class="tabstand"><span class="live"></span>Stand: 02.08.2026</span>
   <button id="notifybtn" type="button" aria-label="Benachrichtigungen einstellen" title="Benachrichtigungen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9A6 6 0 1 0 6 9c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>
   </button>
@@ -626,7 +637,19 @@ const CATS = {
   gas:    {n:"Gas & Wasserstoff",           c:"#a78bfa"},
   waerme: {n:"Wärme & Gebäude",             c:"#fb7185"},
   eff:    {n:"Energieeffizienz",            c:"#2dd4bf"},
-  co2:    {n:"CO₂-Preis, Industrie & Steuern", c:"#eab308"}
+  co2:    {n:"CO₂-Preis, Industrie & Steuern", c:"#eab308"},
+  nachhalt:{n:"Nachhaltigkeit & Berichtspflichten", c:"#e879f9"},
+  rohstoff:{n:"Rohstoffe & Kreislaufwirtschaft",    c:"#f97316"},
+  mako:   {n:"Marktprozesse, IT & Technik", c:"#22d3ee"},
+  genehm: {n:"Anlagen & Genehmigung",       c:"#94a3b8"}
+};
+/* Art des Eintrags – „recht“ ist der Standard und wird in N nicht ausgeschrieben. */
+const ARTS = {
+  recht:{t:"Rechtsakt", i:"⚖️"}, foerd:{t:"Förderung", i:"💶"}, std:{t:"Standard", i:"📐"}
+};
+const LVLS = {
+  EU:{t:"EU-Ebene", i:"🇪🇺", s:"EU"}, DE:{t:"Deutschland", i:"🇩🇪", s:"DE"},
+  INT:{t:"International", i:"🌐", s:"INT"}
 };
 const STATUS = {
   ik:{t:"In Kraft", c:"#34d399"}, vf:{t:"Im Gesetzgebungsverfahren", c:"#fbbf24"},
@@ -734,7 +757,7 @@ const N = [
  p:["Beschleunigte Genehmigungen für strategische Fertigungsprojekte","Resilienz- und Nachhaltigkeitskriterien in Auktionen und Beschaffung","CO₂-Speicherziel: 50 Mt Injektionskapazität bis 2030"],
  r:"Wird durch den Clean Industrial Deal 2025/26 operativ unterlegt.",
  src:"https://eur-lex.europa.eu/eli/reg/2024/1735/oj"},
-{id:"battvo", n:"Batterie-VO", f:"Verordnung (EU) 2023/1542 über Batterien und Altbatterien", lvl:"EU", cat:"co2", st:"ik", stT:"In Kraft (gestufte Anwendung)",
+{id:"battvo", n:"Batterie-VO", f:"Verordnung (EU) 2023/1542 über Batterien und Altbatterien", lvl:"EU", cat:"rohstoff", st:"ik", stT:"In Kraft (gestufte Anwendung)",
  d:"Lebenszyklus-Regulierung für alle Batterien – relevant für Heim- und Großspeicher sowie E-Mobilität.",
  p:["CO₂-Fußabdruck-Deklaration für Industrie-/EV-Batterien","Digitaler Batteriepass ab Februar 2027","Rezyklat-Mindestquoten und Sammelziele","Sorgfaltspflichten in Rohstoff-Lieferketten"],
  r:"Batteriepass-Pflicht ab 18.2.2027 beschäftigt Speicherhersteller und -betreiber.",
@@ -809,7 +832,7 @@ const N = [
  p:["2 %-Flächenziel für Windenergie an Land bleibt Grundpfeiler","Neuer § 6b WindBG: Erleichterungen in Beschleunigungsgebieten (keine UVP und keine artenschutzrechtliche Einzelprüfung im Genehmigungsverfahren)","BauGB-/ROG-Änderungen schließen die Lücke für seit 19.5.2024 ausgewiesene Windflächen"],
  r:"EU-Frist zur Ausweisung von Beschleunigungsgebieten war der 21.2.2026 – Länder und Planungsträger setzen um.",
  src:"https://www.gesetze-im-internet.de/windbg/"},
-{id:"bimschg", n:"BImSchG", f:"Bundes-Immissionsschutzgesetz – Genehmigungsrecht für Energieanlagen", lvl:"DE", cat:"ee", st:"ik", stT:"In Kraft; RED-III-Anpassungen 2026",
+{id:"bimschg", n:"BImSchG", f:"Bundes-Immissionsschutzgesetz – Genehmigungsrecht für Energieanlagen", lvl:"DE", cat:"genehm", st:"ik", stT:"In Kraft; RED-III-Anpassungen 2026",
  d:"Zentrales Genehmigungsgesetz u. a. für Windenergieanlagen, Feuerungsanlagen und Elektrolyseure.",
  p:["Beschleunigungsnovelle 2024: kürzere Fristen, digitale Verfahren, Repowering-Erleichterungen","2026: RED-III-Anpassungen (Verfahren in Beschleunigungsgebieten, Fristenregime)","Vollzug bleibt Ländersache – Praxis entscheidet über Tempo"],
  r:"Teil der RED-III-Gesamtumsetzung Mitte 2026.",
@@ -893,7 +916,347 @@ const N = [
  d:"Setzt das EU-ETS in Deutschland um; Vollzug durch die Deutsche Emissionshandelsstelle (DEHSt).",
  p:["Anwendungsbereich: stationäre Anlagen, Luft- und Seeverkehr","Anpassungen an die ETS-Reform (Fit for 55) umgesetzt","Dient auch als Umsetzungsrahmen für den EU-ETS 2 in Deutschland"],
  r:"Weitere Anpassungen folgen mit dem ETS-2-Start und der ETS-Review.",
- src:"https://www.gesetze-im-internet.de/tehg_2011/"}
+ src:"https://www.gesetze-im-internet.de/tehg_2011/"},
+{id:"mvo", n:"Monitoring-VO", f:"Durchführungsverordnung (EU) 2018/2066 über die Überwachung und Berichterstattung von Treibhausgasemissionen", lvl:"EU", cat:"co2", st:"ik", stT:"In Kraft, laufend angepasst",
+ d:"Legt fest, wie ETS-pflichtige Anlagen ihre Emissionen ermitteln, überwachen und berichten – Datenströme, Emissionsfaktoren und Überwachungspläne.",
+ p:["Überwachungsplan je Anlage, in Deutschland genehmigt durch die DEHSt","Berechnungs- oder Messmethodik mit Ebenen (Tiers) je nach Anlagengröße","Nullbewertung von Biomasse nur mit gültigem Nachhaltigkeitsnachweis","Jährlicher Emissionsbericht, verifiziert durch eine akkreditierte Prüfstelle"],
+ r:"Die konsolidierte Fassung wurde 2025 erneut angepasst. Für den EU-ETS 2 gelten eigene Überwachungsregeln für Inverkehrbringer von Brennstoffen.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02018R2066-20250527"},
+{id:"crma", n:"CRMA", f:"Verordnung (EU) 2024/1252 – Critical Raw Materials Act", lvl:"EU", cat:"rohstoff", st:"ik", stT:"In Kraft seit 23.5.2024",
+ d:"Sichert die Versorgung mit kritischen und strategischen Rohstoffen – Grundlage für Netze, Batteriespeicher, Elektrolyseure und Windkraftanlagen.",
+ p:["Benchmarks bis 2030: 10 % Abbau, 40 % Verarbeitung, 25 % Recycling des EU-Bedarfs","Höchstens 65 % eines strategischen Rohstoffs aus einem einzigen Drittland","Strategische Projekte mit verkürzten Genehmigungsfristen (27 bzw. 15 Monate)","Pflicht großer Unternehmen zu Lieferketten-Risikoanalysen und Stresstests"],
+ r:"Die Kommission hat 2025 Listen strategischer Projekte innerhalb und außerhalb der EU benannt; Monitoring und Vorratshaltung werden derzeit aufgebaut.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R1252-20240503"},
+{id:"abfrrl", n:"Abfallrahmen-RL", f:"Richtlinie 2008/98/EG über Abfälle (Abfallrahmenrichtlinie), zuletzt 2025 geändert", lvl:"EU", cat:"rohstoff", st:"ik", stT:"In Kraft, Novelle 2025",
+ d:"Rahmen des europäischen Abfallrechts: Abfallhierarchie, erweiterte Herstellerverantwortung und das Ende der Abfalleigenschaft.",
+ p:["Fünfstufige Abfallhierarchie – Vermeidung vor Verwertung vor Beseitigung","Kriterien für das Ende der Abfalleigenschaft, relevant für Ersatzbrennstoffe und Klärschlamm","Erweiterte Herstellerverantwortung, mit der Novelle 2025 auch für Textilien","Nationale Umsetzung in Deutschland über das Kreislaufwirtschaftsgesetz"],
+ r:"Die Änderungsrichtlinie von 2025 (Textilien, Lebensmittelabfälle) ist seit Oktober 2025 wirksam; die Anpassung des KrWG steht aus.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02008L0098-20251016"},
+{id:"rfnbo", n:"RFNBO-Kriterien", f:"Delegierte Verordnung (EU) 2023/1184 – Zusätzlichkeit sowie zeitliche und geografische Korrelation für RFNBO", lvl:"EU", cat:"gas", st:"ik", stT:"In Kraft seit 2023",
+ d:"Bestimmt, wann Wasserstoff und Folgeprodukte als erneuerbarer Kraftstoff nicht-biogenen Ursprungs gelten – die Eintrittskarte für RED-Quoten und Förderung.",
+ p:["Zusätzlichkeit: EE-Anlage höchstens 36 Monate älter als der Elektrolyseur","Zeitliche Korrelation monatsscharf, ab 1.1.2030 stundenscharf","Geografische Korrelation: gleiche Gebotszone oder verbundene Zone","Ausnahme bei über 90 % EE-Anteil in der Gebotszone oder sehr niedriger Emissionsintensität"],
+ r:"Die stundenscharfe Korrelation ab 2030 bleibt der zentrale Streitpunkt des Markthochlaufs. Ergänzend regelt die Delegierte Verordnung (EU) 2023/1185 die 70-%-Treibhausgasminderung.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02023R1184-20240610"},
+{id:"h2lc", n:"Low-Carbon-H₂-DA", f:"Delegierte Verordnung (EU) 2025/2359 zur Bewertung der Treibhausgasminderung kohlenstoffarmer Brennstoffe", lvl:"EU", cat:"gas", st:"ik", stT:"Im Amtsblatt seit 21.11.2025",
+ d:"Legt erstmals unionsweit fest, wann Wasserstoff aus fossilen Quellen mit CCS oder aus Kernstrom als kohlenstoffarm gilt.",
+ p:["Mindestens 70 % Treibhausgasminderung gegenüber dem fossilen Vergleichswert","Schwellenwert 28,2 g CO₂-Äq. je MJ über den gesamten Lebensweg","Berücksichtigt Vorketten-Methanemissionen und tatsächliche CO₂-Abscheideraten","Ergänzt Art. 9 Abs. 5 der Gas- und Wasserstoff-Binnenmarktrichtlinie (EU) 2024/1788"],
+ r:"Delegierter Rechtsakt vom 8.7.2025, veröffentlicht am 21.11.2025. Die Zertifizierungssysteme für kohlenstoffarmen Wasserstoff werden derzeit aufgebaut.",
+ src:"https://eur-lex.europa.eu/eli/reg_del/2025/2359/oj/deu"},
+{id:"sfdr", n:"SFDR", f:"Verordnung (EU) 2019/2088 über nachhaltigkeitsbezogene Offenlegungspflichten im Finanzdienstleistungssektor", lvl:"EU", cat:"nachhalt", st:"ik", stT:"In Kraft; Reform im Verfahren",
+ d:"Verpflichtet Finanzmarktteilnehmer zur Offenlegung von Nachhaltigkeitsrisiken – prägt indirekt, wie leicht Energieprojekte finanziert werden.",
+ p:["Offenlegung auf Unternehmens- und auf Produktebene","Artikel-8- und Artikel-9-Produkte als faktische Marktkategorien","PAI-Indikatoren, unter anderem Treibhausgasintensität und Umsätze mit fossilen Brennstoffen","Verzahnt mit Taxonomie-Verordnung und CSRD als Datengrundlage"],
+ r:"Die Kommission hat 2025 einen Vorschlag zur Überarbeitung vorgelegt; die Produktkategorien sollen klarer gefasst und die Offenlegung verschlankt werden. Das Verfahren läuft.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02019R2088-20240109"},
+{id:"taxvo", n:"Taxonomie-VO", f:"Verordnung (EU) 2020/852 über die Einrichtung eines Rahmens zur Erleichterung nachhaltiger Investitionen", lvl:"EU", cat:"nachhalt", st:"ik", stT:"In Kraft; 2026 vereinfacht",
+ d:"Klassifiziert ökologisch nachhaltige Wirtschaftstätigkeiten und ist damit die Referenz für grüne Finanzierung von Erzeugung, Netzen und Speichern.",
+ p:["Sechs Umweltziele, wesentlicher Beitrag plus DNSH-Prüfung und Mindestschutz","Technische Bewertungskriterien unter anderem für Stromerzeugung, Speicher, Übertragung und Verteilung","Erdgas und Kernenergie als Übergangstätigkeiten mit Zusatzkriterien","Kennzahlen: Anteil an Umsatz, Investitions- und Betriebsausgaben"],
+ r:"Die Delegierte Verordnung (EU) 2026/73 (Amtsblatt 8.1.2026) senkt die Datenpunkte um rund 64 % bei Nicht-Finanz- und rund 89 % bei Finanzunternehmen. Tätigkeiten unter 10 % des KPI-Nenners gelten als unwesentlich. Erstanwendung Geschäftsjahr 2025, Verschiebung auf 2026 möglich.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02020R0852-20200622"},
+{id:"csrd", n:"CSRD", f:"Richtlinie (EU) 2022/2464 über die Nachhaltigkeitsberichterstattung von Unternehmen", lvl:"EU", cat:"nachhalt", st:"ik", stT:"In Kraft; durch Omnibus I entschärft",
+ d:"Weitet die Nachhaltigkeitsberichterstattung aus: doppelte Wesentlichkeit, verbindliche ESRS und externe Prüfung.",
+ p:["Doppelte Wesentlichkeit: Wirkung auf Umwelt und Gesellschaft sowie finanzielle Wirkung","Bericht im Lagebericht, digital ausgezeichnet nach ESEF","Prüfung zunächst mit begrenzter Sicherheit","Für Energieversorger im Kern: Transitionsplan, Energiemix und Scope-1-bis-3-Emissionen"],
+ r:"Die Änderungsrichtlinie (EU) 2026/470 („Omnibus I“, Amtsblatt 26.2.2026) hebt die Schwelle auf mehr als 1.000 Beschäftigte an; die Zahl der berichtspflichtigen Unternehmen sinkt damit erheblich.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02022L2464-20250417"},
+{id:"esrs", n:"ESRS", f:"Delegierte Verordnung (EU) 2023/2772 – European Sustainability Reporting Standards", lvl:"EU", cat:"nachhalt", st:"ik", stT:"Überarbeitete Fassung am 3.7.2026 erlassen",
+ d:"Die verbindlichen Berichtsstandards unter der CSRD. Für Energieunternehmen ist ESRS E1 (Klimawandel) der zentrale Baustein.",
+ p:["Zwölf sektorübergreifende Standards: zwei allgemeine, E1–E5, S1–S4 und G1","ESRS E1: Transitionsplan, Scope 1–3, Energieverbrauch und -mix, interner CO₂-Preis","Angaben nur bei Wesentlichkeit – ohne Wesentlichkeitsanalyse keine Pflicht","Sektorspezifische Standards wurden im Zuge der Vereinfachung zurückgestellt"],
+ r:"Die Kommission hat die überarbeiteten ESRS am 3.7.2026 als delegierten Rechtsakt erlassen: verpflichtende Datenpunkte um über 60 % reduziert, Pflichtanwendung ab Geschäftsjahr 2027, freiwillige Anwendung bereits für 2026.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02023R2772-20250101"},
+{id:"csddd", n:"CSDDD", f:"Richtlinie (EU) 2024/1760 über die Sorgfaltspflichten von Unternehmen im Bereich der Nachhaltigkeit", lvl:"EU", cat:"nachhalt", st:"ik", stT:"In Kraft; Umsetzung bis 26.7.2027",
+ d:"Verpflichtet große Unternehmen zu menschenrechtlicher und umweltbezogener Sorgfalt entlang der Aktivitätenkette.",
+ p:["Risikobasierte Sorgfaltspflichten statt starrer Prüfliste","Pflicht zu einem Klimatransitionsplan mit Bezug auf das 1,5-Grad-Ziel","Zivilrechtliche Haftung – durch Omnibus I abgeschwächt","Löst in Deutschland das LkSG ab"],
+ r:"Omnibus I (RL (EU) 2026/470, Amtsblatt 26.2.2026) begrenzt den Anwendungsbereich deutlich; maßgeblich sind nun Schwellen von rund 5.000 Beschäftigten und 1,5 Mrd. € Umsatz. Umsetzungsfrist 26.7.2027.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024L1760-20250417"},
+{id:"sogl", n:"SOGL", f:"Verordnung (EU) 2017/1485 zur Festlegung einer Leitlinie für den Übertragungsnetzbetrieb", lvl:"EU", cat:"netz", st:"ik", stT:"In Kraft",
+ d:"Harmonisiert den Betrieb des europäischen Verbundnetzes: Betriebssicherheit, Frequenzhaltung, Regelreserve und Koordination der Übertragungsnetzbetreiber.",
+ p:["Systemzustände (Normal, Gefährdet, Notzustand) und Betriebssicherheitsgrenzwerte","Rahmen für FCR, aFRR und mFRR – Basis der Präqualifikation von Speichern und Aggregatoren","Datenaustausch zwischen ÜNB, VNB und signifikanten Netznutzern","Grundlage der nationalen Regeln für Systemdienstleistungen"],
+ r:"ACER hat am 7.3.2025 den Entwurf eines Netzkodex Demand Response vorgelegt, der Laststeuerung und Aggregatoren europaweit vereinheitlicht. Die Kommission arbeitet an der Verordnung, nationale Anwendung wird ab 2027 erwartet.",
+ src:"https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A32017R1485"},
+{id:"ervo", n:"ER-Netzkodex", f:"Verordnung (EU) 2017/2196 über einen Netzkodex für den Notzustand und den Netzwiederaufbau", lvl:"EU", cat:"netz", st:"ik", stT:"In Kraft",
+ d:"Regelt Notfallmaßnahmen und den koordinierten Wiederaufbau der Stromversorgung bis hin zum Schwarzfall.",
+ p:["Pflicht zu Systemschutz-, Wiederaufbau- und Testplänen je Übertragungsnetzbetreiber","Frequenz- und spannungsabhängiger sowie manueller Lastabwurf","Schwarzstartfähigkeit und Inselbetrieb ausgewählter Anlagen","Betreiber signifikanter Anlagen müssen Kommunikation und Testbarkeit sicherstellen"],
+ r:"Nach dem großflächigen Stromausfall auf der Iberischen Halbinsel im April 2025 überprüfen ENTSO-E und ACER die Vorgaben zu Wiederaufbau, Spannungshaltung und Momentanreserve.",
+ src:"https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A32017R2196"},
+{id:"sosgas", n:"SoS-VO Gas", f:"Verordnung (EU) 2017/1938 über Maßnahmen zur Gewährleistung der sicheren Gasversorgung", lvl:"EU", cat:"gas", st:"ik", stT:"In Kraft, 2025 geändert",
+ d:"Krisenrahmen für die Gasversorgung: Risikobewertung, Präventions- und Notfallpläne sowie Solidarität zwischen Mitgliedstaaten.",
+ p:["Drei Krisenstufen: Frühwarnung, Alarm und Notfall","Versorgungsstandard für geschützte Kunden – Haushalte, Fernwärme und soziale Dienste","Solidaritätsmechanismus zwischen benachbarten Mitgliedstaaten","Regionale Risikogruppen und gemeinsame Notfallübungen"],
+ r:"Konsolidierte Fassung von September 2025. Die Speicherfüllvorgaben wurden 2025 flexibilisiert – Einzelheiten in der Gasspeicher-Verordnung.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02017R1938-20250911"},
+{id:"ied", n:"IED (Industrieemissionen)", f:"Richtlinie 2010/75/EU über Industrieemissionen, geändert durch Richtlinie (EU) 2024/1785", lvl:"EU", cat:"genehm", st:"ik", stT:"In Kraft; Umsetzungsfrist 1.7.2026",
+ d:"Genehmigungs- und Emissionsrahmen für Industrieanlagen und Großfeuerungsanlagen auf Basis der besten verfügbaren Techniken.",
+ p:["Emissionsgrenzwerte am strengeren Ende der BVT-Bandbreiten","Neu: Umweltmanagementsystem und Transformationsplan bis 2030 für große Anlagen","Anwendungsbereich erweitert, unter anderem auf Batteriefertigung","Elektronische Genehmigungsverfahren und verschärfte Sanktionen"],
+ r:"Umsetzungsfrist ist der 1.7.2026. Das Bundeskabinett hat am 21.1.2026 ein Mantelgesetz und eine Mantelverordnung beschlossen; geändert werden BImSchG, WHG, KrWG, UVPG, BBergG und UAG. Das parlamentarische Verfahren läuft.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02010L0075-20240804"},
+{id:"uvpd", n:"UVP-Richtlinie", f:"Richtlinie 2011/92/EU über die Umweltverträglichkeitsprüfung, geändert durch Richtlinie 2014/52/EU", lvl:"EU", cat:"genehm", st:"ik", stT:"In Kraft",
+ d:"Verfahrensrahmen für die Umweltverträglichkeitsprüfung – für Kraftwerke, Leitungen, Windparks und Großspeicher der Taktgeber im Genehmigungsverfahren.",
+ p:["Anhang I: obligatorische UVP, unter anderem Wärmekraftwerke ab 300 MW","Anhang II: Vorprüfung des Einzelfalls (Screening)","UVP-Bericht, Behörden- und Öffentlichkeitsbeteiligung","In Deutschland umgesetzt im UVPG; RED III und NABEG verkürzen einzelne Prüfschritte"],
+ r:"Die IED-Umsetzung 2026 ändert auch das UVPG. In EE-Beschleunigungsgebieten entfällt nach RED III die Einzelfallprüfung weitgehend.",
+ src:"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02011L0092-20140515"},
+{id:"stromnev", n:"StromNEV", f:"Stromnetzentgeltverordnung (StromNEV)", lvl:"DE", cat:"netz", st:"ik", stT:"In Kraft; Reform über AgNES",
+ d:"Bestimmt, wie Stromnetzentgelte kalkuliert und gewälzt werden – samt der Sonderentgelte für atypische und intensive Netznutzung.",
+ p:["§ 19 Abs. 2 Satz 1: individuelles Netzentgelt bei atypischer Netznutzung","§ 19 Abs. 2 Satz 2: bis zu 90 % Reduzierung ab 7.000 Benutzungsstunden und 10 GWh Abnahme","Die § 19-Umlage finanziert die Mindererlöse, erhoben über das EnFG","Regeln zu Netzanschluss und Baukostenzuschüssen für Erzeuger und Speicher"],
+ r:"Die Bundesnetzagentur gestaltet die Systematik im Festlegungsverfahren AgNES neu. Die § 19-Privilegien und die Entgeltpflicht von Speichern und Elektrolyseuren stehen dabei zur Disposition.",
+ src:"https://www.gesetze-im-internet.de/stromnev/"},
+{id:"gasnev", n:"GasNEV", f:"Gasnetzentgeltverordnung (GasNEV)", lvl:"DE", cat:"netz", st:"ik", stT:"In Kraft",
+ d:"Grundsätze der Entgeltbildung im Gasnetz: kalkulatorische Kosten, Abschreibungen und Aufteilung auf Ein- und Ausspeisepunkte.",
+ p:["Ein- und Ausspeisesystem statt transaktionsbezogener Entgelte","Kalkulatorische Eigenkapitalverzinsung und Abschreibungsmodalitäten","Kostenwälzung zwischen Fernleitungs- und Verteilnetzebene","Im Fokus: sinkende Gasabsatzmengen und die drohende Entgeltspirale"],
+ r:"Die Bundesnetzagentur hat mit der Festlegung KANU 2.0 kürzere kalkulatorische Nutzungsdauern für Gasverteilernetze ermöglicht, damit Kosten vor dem Rückbau abgeschrieben werden können.",
+ src:"https://www.gesetze-im-internet.de/gasnev/"},
+{id:"aregv", n:"ARegV", f:"Anreizregulierungsverordnung (ARegV)", lvl:"DE", cat:"netz", st:"ik", stT:"In Kraft; Ablösung durch BNetzA-Festlegungen",
+ d:"Setzt Erlösobergrenzen für Strom- und Gasnetzbetreiber über mehrjährige Regulierungsperioden mit Effizienzvergleich.",
+ p:["Erlösobergrenze statt Einzelentgeltgenehmigung, Effizienzvergleich als Benchmarking","Vierte Regulierungsperiode: Gas ab 2023, Strom ab 2024","Kapitalkostenabgleich und Investitionsmaßnahmen für den Netzausbau","Eigenkapitalzinssatz für Neuanlagen der vierten Periode Strom: 5,07 %"],
+ r:"Nach dem EuGH-Urteil vom 2.9.2021 zur Unabhängigkeit der Regulierungsbehörde verlagert die Bundesnetzagentur die Regulierung schrittweise von der Verordnung in eigene Festlegungen (NEST für die Erlösobergrenzen, AgNES für die Entgeltsystematik).",
+ src:"https://www.gesetze-im-internet.de/aregv/"},
+{id:"mabis", n:"MaBiS", f:"Marktregeln für die Bilanzkreisabrechnung Strom – Festlegung der Bundesnetzagentur", lvl:"DE", cat:"mako", st:"ik", stT:"In Kraft, laufend angepasst",
+ d:"Standardisiert die Bilanzkreisabrechnung Strom: Zeitreihen, Aggregation von Messwerten und Abrechnung von Differenzmengen.",
+ p:["Rollen: Bilanzkreisverantwortlicher, Lieferant, Netzbetreiber, Bilanzkoordinator","Zeitreihentypen und Fristen für Lieferschein und Bilanzkreisabrechnung","Grundlage der Mehr- und Mindermengenabrechnung","Für Direktvermarkter und Aggregatoren die operative Basis – ohne saubere Zeitreihen keine Vermarktung"],
+ r:"Die Prozesse werden auf AS4 und JSON-Schnittstellen umgestellt; verbindliche Releases zum 1.4. und 1.10.2026.",
+ src:"https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK06/BK6_83_Zug_Mess/833_mabis/mabis_node.html"},
+{id:"gabigas", n:"GaBi Gas", f:"Grundmodell der Bilanzkreisabrechnung Gas – Festlegung der Bundesnetzagentur", lvl:"DE", cat:"mako", st:"ik", stT:"In Kraft",
+ d:"Regelt die Bilanzierung im Gasmarkt: Ausgleich von Bilanzkreisabweichungen, Ein- und Ausspeiseprofile sowie Mehr- und Mindermengen.",
+ p:["Tagesbilanzierung mit Anreizsystem für ausgeglichene Bilanzkreise","Unterschiedliche Regeln für Standardlastprofil- und RLM-Kunden","Regel- und Ausgleichsenergie über den Marktgebietsverantwortlichen THE","Mehr- und Mindermengenabrechnung zwischen Netzbetreiber und Lieferant"],
+ r:"Seit der Zusammenlegung zum einheitlichen Marktgebiet Trading Hub Europe laufen die Prozesse bundesweit einheitlich; Anpassungen für Wasserstoffnetze werden vorbereitet.",
+ src:"https://www.bundesnetzagentur.de/DE/Fachthemen/Energie/Gas/Bilanzierung/GabiGas/GabiGas_node.html"},
+{id:"bbplg", n:"BBPlG", f:"Bundesbedarfsplangesetz (BBPlG)", lvl:"DE", cat:"netz", st:"ik", stT:"In Kraft, wird fortgeschrieben",
+ d:"Stellt den vordringlichen Bedarf für Höchstspannungsvorhaben gesetzlich fest – die Grundlage jeder weiteren Planungsstufe.",
+ p:["Gesetzliche Feststellung der energiewirtschaftlichen Notwendigkeit, im Verfahren nicht mehr angreifbar","Kennzeichnung für Bundesfachplanung, Erdkabelvorrang und Pilotvorhaben","Enthält unter anderem SuedLink, SuedOstLink und A-Nord","Fortschreibung im Rhythmus des Netzentwicklungsplans"],
+ r:"Die nächste Fortschreibung folgt dem Netzentwicklungsplan 2037/2045; parallel wird über eine stärkere Nutzung von Freileitungen statt Erdkabeln zur Kostensenkung diskutiert.",
+ src:"https://www.gesetze-im-internet.de/bbplg/"},
+{id:"hkrndv", n:"HkRNDV", f:"Herkunfts- und Regionalnachweis-Durchführungsverordnung (HkRNDV)", lvl:"DE", cat:"ee", st:"ik", stT:"In Kraft",
+ d:"Konkretisiert Ausstellung, Übertragung und Entwertung von Herkunfts- und Regionalnachweisen im Register des Umweltbundesamts.",
+ p:["Herkunftsnachweise für Strom, erweitert auf Gas, Wasserstoff, Wärme und Kälte","Ein Nachweis je Megawattstunde, Entwertung als Voraussetzung der Stromkennzeichnung","Doppelvermarktungsverbot: kein Herkunftsnachweis für EEG-geförderten Strom","Regionalnachweise für Strom aus einem Umkreis von 50 Kilometern"],
+ r:"Der Aufbau der Register für Gas, Wasserstoff, Wärme und Kälte beim Umweltbundesamt läuft. Für RFNBO gelten zusätzlich die EU-Kriterien.",
+ src:"https://www.gesetze-im-internet.de/hkrndv/"},
+{id:"kvbg", n:"KVBG (Kohleausstieg)", f:"Gesetz zur Reduzierung und zur Beendigung der Kohleverstromung (KVBG)", lvl:"DE", cat:"strom", st:"ik", stT:"In Kraft",
+ d:"Regelt den Stilllegungspfad für Stein- und Braunkohleanlagen samt Entschädigungen und Ausschreibungen.",
+ p:["Zielpfad: 30 GW im Jahr 2022, 17 GW im Jahr 2030, Ende spätestens 2038","Steinkohle: sieben Ausschreibungsrunden abgeschlossen, danach gesetzliche Reduzierung per Bescheid","Braunkohle: vertraglich vereinbarter Pfad, im Rheinland auf 2030 vorgezogen","Zielniveau Steinkohle zum Zieltermin 2026: 9.869 MW"],
+ r:"Ab dem Zieltermin 2027 ordnet die Bundesnetzagentur die Beendigung der Kohleverfeuerung an. Ob der Pfad hält, hängt am Zubau steuerbarer Leistung über das Kraftwerkssicherheitsgesetz.",
+ src:"https://www.gesetze-im-internet.de/kvbg/"},
+{id:"krwg", n:"KrWG", f:"Kreislaufwirtschaftsgesetz (KrWG)", lvl:"DE", cat:"rohstoff", st:"ik", stT:"In Kraft; IED-Novelle im Verfahren",
+ d:"Nationales Abfallrecht: Abfallhierarchie, Produktverantwortung und Anforderungen an die energetische Verwertung.",
+ p:["Fünfstufige Abfallhierarchie mit Heizwertklausel für die energetische Verwertung","Ende der Abfalleigenschaft – maßgeblich für Ersatzbrennstoffe und Klärschlamm","Erweiterte Produktverantwortung der Hersteller","Rechtlicher Unterbau für Abfallverbrennung und Mitverbrennung"],
+ r:"Wird im Zuge der IED-Umsetzung 2026 geändert. Die EU-Novelle der Abfallrahmenrichtlinie erfordert weitere Anpassungen bei Textilien und Lebensmittelabfällen.",
+ src:"https://www.gesetze-im-internet.de/krwg/"},
+{id:"biomassev", n:"BiomasseV", f:"Biomasseverordnung (BiomasseV)", lvl:"DE", cat:"ee", st:"ik", stT:"In Kraft",
+ d:"Definiert, welche Stoffe im Sinne des EEG als Biomasse gelten und welche Umwandlungsverfahren zulässig sind.",
+ p:["Positiv- und Negativliste anerkannter Einsatzstoffe","Zulässige Technologien, unter anderem Verbrennung, Vergasung und Vergärung","Anforderungen an Einsatzstoff-Dokumentation und Umweltverträglichkeit","Voraussetzung für die EEG-Vergütung von Biogas- und Biomasseanlagen"],
+ r:"Mit der Flexibilisierung des Biomassepakets rückt die bedarfsgerechte Fahrweise in den Vordergrund; die EEG-Reform 2026 wird auch die Einsatzstoffregeln berühren.",
+ src:"https://www.gesetze-im-internet.de/biomassev/"},
+{id:"biostnachv", n:"BioSt-NachV", f:"Biomassestrom-Nachhaltigkeitsverordnung (BioSt-NachV 2021)", lvl:"DE", cat:"ee", st:"ik", stT:"In Kraft",
+ d:"Setzt die Nachhaltigkeitsanforderungen der RED für Strom aus fester, flüssiger und gasförmiger Biomasse in deutsches Recht um.",
+ p:["Zertifizierung der gesamten Lieferkette über anerkannte Systeme wie REDcert, SURE oder ISCC","Mindestwerte für die Treibhausgaseinsparung je nach Inbetriebnahmejahr","Schutz von Flächen mit hohem Biodiversitätswert und hohem Kohlenstoffbestand","Nachweisführung über das Nabisy-Register der Bundesanstalt für Landwirtschaft und Ernährung"],
+ r:"Ohne gültigen Nachhaltigkeitsnachweis entfallen EEG-Vergütung und Nullbewertung im Emissionshandel. Die Kontrolldichte ist nach den Betrugsfällen bei Biokraftstoff-Importen deutlich gestiegen.",
+ src:"https://www.gesetze-im-internet.de/biost-nachv_2021/"},
+{id:"energiestg", n:"EnergieStG", f:"Energiesteuergesetz (EnergieStG)", lvl:"DE", cat:"co2", st:"ik", stT:"In Kraft",
+ d:"Verbrauchsteuer auf Energieerzeugnisse. Für KWK und BHKW entscheiden die Entlastungstatbestände unmittelbar über die Wirtschaftlichkeit.",
+ p:["§ 53a: vollständige Steuerentlastung für hocheffiziente KWK-Anlagen ab 70 % Jahresnutzungsgrad","§ 53: Steuerentlastung für die Stromerzeugung in Anlagen ab 2 MW elektrischer Nennleistung","§ 51: Entlastung für bestimmte Prozesse und Verfahren","Antrag beim Hauptzollamt; beihilferechtliche Meldung über die EnSTransV"],
+ r:"Die EU-Energiesteuerrichtlinie wird seit 2021 überarbeitet, eine Einigung steht aus. Bis dahin bleibt der nationale Rahmen unverändert.",
+ src:"https://www.gesetze-im-internet.de/energiestg/"},
+{id:"stromstg", n:"StromStG", f:"Stromsteuergesetz (StromStG)", lvl:"DE", cat:"co2", st:"ik", stT:"In Kraft; Entlastung 2026 ausgeweitet",
+ d:"Besteuert die Entnahme von Strom aus dem Netz. Die Befreiungen entscheiden über die Wirtschaftlichkeit von Eigenversorgung und Speichern.",
+ p:["Regelsteuersatz 20,50 € je Megawattstunde","§ 9 Abs. 1 Nr. 1: Befreiung für Strom aus ausschließlich erneuerbaren Energien im räumlichen Zusammenhang","§ 9 Abs. 1 Nr. 3: Befreiung für Anlagen bis 2 MW bei Eigenverbrauch oder Belieferung im Umkreis","Speicher gelten als Teil des Versorgungsnetzes, eine Doppelbesteuerung wird dadurch vermieden"],
+ r:"Mit dem Strompreispaket 2026 gilt für das produzierende Gewerbe sowie Land- und Forstwirtschaft dauerhaft der EU-Mindestsatz von 0,05 ct/kWh statt 2,05 ct/kWh.",
+ src:"https://www.gesetze-im-internet.de/stromstg/"},
+{id:"stromstv", n:"StromStV", f:"Verordnung zur Durchführung des Stromsteuergesetzes (StromStV)", lvl:"DE", cat:"co2", st:"ik", stT:"In Kraft",
+ d:"Führt das Stromsteuergesetz aus: Erlaubnisverfahren, Nachweise und die Abgrenzung von Eigenerzeugung und Versorgung.",
+ p:["Erlaubnis als Versorger, Eigenerzeuger oder Letztverbraucher","§ 12b: Abgrenzung des räumlichen Zusammenhangs über einen Radius von 4,5 Kilometern","Aufzeichnungs- und Nachweispflichten für jede Steuerbefreiung","Verfahren für Entlastungsanträge und Selbstberechnung"],
+ r:"Die Abgrenzung von Kundenanlagen, Quartierslösungen und Arealnetzen bleibt streitanfällig und ist bei jedem Vor-Ort-Konzept einzeln zu prüfen.",
+ src:"https://www.gesetze-im-internet.de/stromstv/"},
+{id:"kwkausv", n:"KWKAusV", f:"KWK-Ausschreibungsverordnung (KWKAusV)", lvl:"DE", cat:"strom", st:"ik", stT:"In Kraft; Ausschreibungen ab 2026 ohne Volumen",
+ d:"Regelt die Ausschreibungen für KWK-Anlagen zwischen 1 und 50 MW sowie für innovative KWK-Systeme.",
+ p:["Getrennte Gebotstermine für konventionelle KWK und für iKWK-Systeme","iKWK: KWK plus innovative erneuerbare Wärme, etwa Großwärmepumpe, Solarthermie oder Elektroheizer","Zuschlagszahlung über 30.000 Vollbenutzungsstunden","Sicherheiten je Gebot und Pönalen bei Nichtrealisierung"],
+ r:"Für Ausschreibungsvolumina ab 2026 fehlt bislang die Rechtsgrundlage: Nach der letzten Runde im Dezember 2025 können größere KWK-Anlagen nicht mehr bieten. B.KWK, AGFW und VKU drängen auf eine kurzfristige Verlängerung.",
+ src:"https://www.gesetze-im-internet.de/kwkausv/"},
+{id:"hgbnach", n:"§§ 289b ff. HGB", f:"Umsetzung der CSRD im Handelsgesetzbuch – Nachhaltigkeitsberichterstattung", lvl:"DE", cat:"nachhalt", st:"vf", stT:"Umsetzungsgesetz im Verfahren",
+ d:"Verankert die Nachhaltigkeitsberichterstattung im deutschen Bilanzrecht: Lagebericht, ESRS-Anwendung und Prüfungspflicht.",
+ p:["Nachhaltigkeitsbericht als eigener Abschnitt des Lageberichts","Doppelte Wesentlichkeit und verbindliche Anwendung der ESRS","Prüfung zunächst mit begrenzter Sicherheit","Sanktionen über die handelsrechtlichen Bußgeld- und Ordnungsgeldtatbestände"],
+ r:"Deutschland hat die CSRD verspätet umgesetzt; durch die Omnibus-Änderungen (RL (EU) 2026/470) wurde der Entwurf erneut angepasst. Der genaue Stand des Verfahrens ist vor jeder Anwendung zu prüfen.",
+ src:"https://www.gesetze-im-internet.de/hgb/__289b.html"},
+{id:"lksg", n:"LkSG", f:"Lieferkettensorgfaltspflichtengesetz (LkSG)", lvl:"DE", cat:"nachhalt", st:"ik", stT:"In Kraft; Berichtspflicht entfallen",
+ d:"Verpflichtet Unternehmen ab 1.000 Beschäftigten zu einem Risikomanagement für Menschenrechte und Umwelt in der Lieferkette.",
+ p:["Risikoanalyse, Präventions- und Abhilfemaßnahmen, Beschwerdeverfahren","Abgestufte Pflichten für eigenen Geschäftsbereich sowie unmittelbare und mittelbare Zulieferer","Für Energieversorger relevant bei PV-Modulen, Batterien und Biomasse-Importen","Aufsicht durch das BAFA"],
+ r:"Die jährliche Berichtspflicht wurde rückwirkend gestrichen, das Änderungsgesetz war Anfang 2026 im Bundestag. Sanktioniert werden nur noch schwerwiegende Verstöße. Ab 26.7.2027 löst die CSDDD das LkSG ab.",
+ src:"https://www.gesetze-im-internet.de/lksg/"},
+{id:"gasgvv", n:"GasGVV", f:"Gasgrundversorgungsverordnung (GasGVV)", lvl:"DE", cat:"gas", st:"ik", stT:"In Kraft",
+ d:"Allgemeine Bedingungen der Gas-Grundversorgung von Haushaltskunden: Vertragsschluss, Abrechnung, Preisänderung und Sperrung.",
+ p:["Vertragsschluss durch Entnahme, also konkludentes Handeln","Preisänderungen nur mit Ankündigung und Sonderkündigungsrecht","Strenge Voraussetzungen für die Versorgungsunterbrechung bei Zahlungsverzug","Vorgaben zu Messung, Abschlägen und Abrechnung"],
+ r:"Mit der Umsetzung des EU-Gasbinnenmarktpakets über die EnWG-Novelle 2026 kommen neue Verbraucherrechte hinzu, unter anderem beim Wechsel und bei Vertragsbeendigung.",
+ src:"https://www.gesetze-im-internet.de/gasgvv/"},
+{id:"stromgvv", n:"StromGVV", f:"Stromgrundversorgungsverordnung (StromGVV)", lvl:"DE", cat:"strom", st:"ik", stT:"In Kraft",
+ d:"Rechte und Pflichten zwischen Grundversorger und Haushaltskunden in der allgemeinen Versorgung.",
+ p:["Vertragsschluss durch Stromentnahme; Grundversorgungspflicht des örtlichen Grundversorgers","Preisanpassung nur zum Monatsersten mit sechswöchiger Ankündigung","Versorgungsunterbrechung erst ab 100 € Rückstand und nach Androhung","Regeln zu Abschlägen, Abrechnung und Zählerstandsermittlung"],
+ r:"Mit der Umsetzung der Strombinnenmarkt-Richtlinie bis 17.7.2026 kommen Vorgaben zu dynamischen Tarifen, Energy Sharing und zum Lieferantenausfall hinzu.",
+ src:"https://www.gesetze-im-internet.de/stromgvv/"},
+{id:"bsig", n:"BSIG (NIS2)", f:"BSI-Gesetz in der Fassung des NIS-2-Umsetzungsgesetzes", lvl:"DE", cat:"mako", st:"ik", stT:"In Kraft seit 6.12.2025",
+ d:"Cybersicherheitsrecht für kritische Anlagen und wichtige Einrichtungen. Energieversorger, Netz- und Messstellenbetreiber sind erfasst.",
+ p:["Registrierungspflicht beim BSI über das Portal muk.bsi.bund.de, Frist war der 31.7.2026","Risikomanagement nach Stand der Technik; für KRITIS-Betreiber Nachweise alle drei Jahre","Gestufte Meldepflicht: Erstmeldung in 24 Stunden, Folgemeldung in 72 Stunden, Abschlussbericht in einem Monat","Persönliche Verantwortung der Geschäftsleitung, Bußgelder bis 10 Mio. € oder 2 % des Umsatzes"],
+ r:"Der Anwendungsbereich wächst von rund 4.500 auf etwa 29.500 Einrichtungen. Für den Energiesektor gilt zusätzlich der IT-Sicherheitskatalog der Bundesnetzagentur nach § 11 Abs. 1a und 1b EnWG.",
+ src:"https://www.gesetze-im-internet.de/bsig_2025/BJNR12D0B0025.html"},
+{id:"kritisv", n:"BSI-KritisV", f:"BSI-Kritisverordnung (BSI-KritisV)", lvl:"DE", cat:"mako", st:"ik", stT:"In Kraft; Anpassung an NIS2 läuft",
+ d:"Bestimmt über Schwellenwerte, welche Anlagen als Kritische Infrastruktur gelten – im Energiesektor Erzeugung, Übertragung, Verteilung und Messung.",
+ p:["Regelschwelle: Versorgung von 500.000 Menschen","Strom: Erzeugungsanlagen ab 420 MW, Verteilernetze ab 3.700 GWh im Jahr","Gas: Fernleitungs- und Verteilernetze sowie Speicher ab definierten Kapazitäten","Messstellenbetrieb und Steuerungstechnik ausdrücklich erfasst"],
+ r:"Die Verordnung wird an das neue BSIG und das geplante KRITIS-Dachgesetz angepasst. Parallel gilt die Registrierungspflicht für die deutlich größere Gruppe der wichtigen und besonders wichtigen Einrichtungen.",
+ src:"https://www.gesetze-im-internet.de/bsi-kritisv/"},
+{id:"bimschv1344", n:"13./44. BImSchV", f:"Verordnungen über Großfeuerungsanlagen (13. BImSchV) und mittelgroße Feuerungsanlagen (44. BImSchV)", lvl:"DE", cat:"genehm", st:"ik", stT:"In Kraft",
+ d:"Emissionsgrenzwerte und Überwachungspflichten für Feuerungsanlagen – der maßgebliche Rahmen für BHKW, Motoren und Gasturbinen.",
+ p:["13. BImSchV: Feuerungswärmeleistung ab 50 MW","44. BImSchV: 1 MW bis unter 50 MW – hier liegt das Gros der BHKW","Grenzwerte für Stickstoffoxide, Kohlenmonoxid, Schwefeldioxid und Staub, differenziert nach Brennstoff","Bestandsanlagen: Anforderungen seit 1.1.2025 über 5 MW, ab 1.1.2030 für 1 bis 5 MW"],
+ r:"Die IED-Novelle 2026 zieht weitere Anpassungen nach sich. Für wasserstofffähige Motoren und Spitzenlastkessel fehlen bislang passgenaue Grenzwerte.",
+ src:"https://www.gesetze-im-internet.de/bimschv_13_2021/"},
+{id:"bimschv17", n:"17. BImSchV", f:"Verordnung über die Verbrennung und die Mitverbrennung von Abfällen (17. BImSchV)", lvl:"DE", cat:"genehm", st:"ik", stT:"In Kraft",
+ d:"Strenge Grenzwerte für Abfallverbrennungs- und Mitverbrennungsanlagen – maßgeblich für EBS-Kraftwerke und Klärschlammverwertung.",
+ p:["Grenzwerte unter anderem für Dioxine, Furane, Quecksilber und Schwermetalle","Mindestverbrennungsbedingungen: 850 °C, bei halogenorganischen Stoffen 1.100 °C, jeweils zwei Sekunden Verweilzeit","Kontinuierliche Emissionsmessung und Veröffentlichung der Messergebnisse","Mischungsregel für Mitverbrennung in Zement- und Kraftwerksanlagen"],
+ r:"Abfallverbrennungsanlagen sind seit 2024 in den nationalen Emissionshandel einbezogen. Über die Einbeziehung in das EU-ETS ab 2028 entscheidet die Kommission auf Basis eines Berichts.",
+ src:"https://www.gesetze-im-internet.de/bimschv_17_2013/BJNR104400013.html"},
+{id:"whg", n:"WHG", f:"Wasserhaushaltsgesetz (WHG)", lvl:"DE", cat:"genehm", st:"ik", stT:"In Kraft; IED-Novelle im Verfahren",
+ d:"Gewässerrecht für Kühlwasser, Einleitungen und Wärmeeintrag – genehmigungsrelevant für thermische Kraftwerke, Großwärmepumpen und Geothermie.",
+ p:["Erlaubnis und Bewilligung für Entnahme und Einleitung von Wasser","Anforderungen an den Umgang mit wassergefährdenden Stoffen über die AwSV","Wärmelastpläne und Grenzwerte für die Aufwärmung von Gewässern","Grundwasserschutz bei Erdwärmesonden und Aquiferspeichern"],
+ r:"Wird im Zuge der IED-Umsetzung 2026 geändert. Trockene Sommer verschärfen die Konflikte um Kühlwasserentnahmen und Wärmeeinleitungen.",
+ src:"https://www.gesetze-im-internet.de/whg_2009/"},
+{id:"foerdeegkwkg", n:"EEG-/KWKG-Vergütung", f:"Vergütungs- und Marktmechanismen nach EEG und KWKG – die operative Förderebene", lvl:"DE", art:"foerd", cat:"ee", st:"ik", stT:"Laufend",
+ d:"Die operative Förderung auf Basis der beiden Kerngesetze: Marktprämie, Einspeisevergütung, Ausschreibungen und KWK-Zuschläge.",
+ p:["Gleitende Marktprämie in der Direktvermarktung, Pflicht ab 100 kW installierter Leistung","Ausschreibungen für Wind an Land und auf See, Solar, Biomasse und Innovation","Mieterstromzuschlag sowie Zuschläge für Gebäude- und Freiflächen-PV","KWKG: Zuschlag je Kilowattstunde, Kohleersatzbonus, iKWK-Bonus, Wärmenetz- und Speicherförderung"],
+ r:"Bei negativen Börsenpreisen entfällt die Förderung – Folge des Solarspitzengesetzes seit 25.2.2025. Die EEG-Reform 2026 soll stärker auf investitionskostenbasierte Förderung und Systemdienlichkeit umstellen.",
+ src:"https://www.gesetze-im-internet.de/eeg_2014/"},
+{id:"ccfd", n:"Klimaschutzverträge", f:"CO₂-Differenzverträge des BMWE (Carbon Contracts for Difference)", lvl:"DE", art:"foerd", cat:"co2", st:"ik", stT:"Zweite Gebotsrunde 2026 läuft",
+ d:"Sichert die Mehrkosten klimafreundlicher Produktionsverfahren über 15 Jahre ab – wettbewerblich nach Förderbedarf je vermiedener Tonne CO₂.",
+ p:["Laufzeit 15 Jahre mit jährlicher Anpassung an CO₂- und Energiepreise","Rückzahlungspflicht, wenn der Marktpreis über den Vertragspreis steigt","Zuschlag für die Projekte mit dem geringsten Förderbedarf je Tonne CO₂","Zweite Runde 2026: 5 Mrd. €, davon 3 Mrd. € Grund- und 2 Mrd. € Zusatzvolumen"],
+ r:"Das vorbereitende Verfahren lief bis 1.12.2025 und war Voraussetzung für ein Gebot. Die Gebotsfrist der zweiten Runde endet am 7.9.2026.",
+ src:"https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Wasserstoff/Foerderung-National/018-pilotprogramm.html"},
+{id:"h2foerd", n:"H₂-Markthochlauf", f:"IPCEI Wasserstoff, H2Global und flankierende Förderinstrumente", lvl:"DE", art:"foerd", cat:"gas", st:"pg", stT:"Programme laufen, Tempo verhalten",
+ d:"Bündel aus Beihilfe- und Auktionsinstrumenten für Erzeugung, Import und Transport von Wasserstoff.",
+ p:["IPCEI Hy2Tech, Hy2Use, Hy2Infra und Hy2Move – Bund und Länder fördern Verbundprojekte","H2Global: Doppelauktion über die Hintco, gleicht die Differenz zwischen Import- und Verkaufspreis aus","Europäische Wasserstoffbank mit Auktionen für die RFNBO-Erzeugung","Flankierend das Wasserstoff-Kernnetz mit Amortisationskonto"],
+ r:"Der Hochlauf verläuft langsamer als geplant, mehrere IPCEI-Vorhaben wurden gestreckt oder aufgegeben. Die Fördermittel wurden 2025/2026 neu priorisiert.",
+ src:"https://www.h2-global.de/"},
+{id:"bafa", n:"BAFA-Förderung", f:"Bundesamt für Wirtschaft und Ausfuhrkontrolle – BEG EM, EEW und BEW", lvl:"DE", art:"foerd", cat:"eff", st:"ik", stT:"Läuft; 2026 gekürzt",
+ d:"Zentrale Bewilligungsbehörde für Energieeffizienz und erneuerbare Wärme in Gebäuden, Industrie und Wärmenetzen.",
+ p:["BEG EM: Einzelmaßnahmen an Gebäuden – Wärmepumpe, Solarthermie, Biomasse, Anlagentechnik","EEW: Energie- und Ressourceneffizienz in der Wirtschaft, unter anderem Prozesswärme aus erneuerbaren Energien","BEW: Bundesförderung für effiziente Wärmenetze – Machbarkeitsstudien, Neubau und Transformation","Energieberatung und Energieaudits nach EDL-G ebenfalls über das BAFA"],
+ r:"Modul 1 der BEW (Transformationspläne und Machbarkeitsstudien) endet zum 1.4.2026, ausgenommen Prozesswärmenetze; Anträge bis 31.3.2026 werden noch bearbeitet. Nach dem Förderstopp bis 21.7.2026 gelten bei BAFA und KfW reduzierte Konditionen.",
+ src:"https://www.bafa.de/DE/Energie/Energieeffizienz/Waermenetze/Effiziente_Waermenetze/effiziente_waermenetze_node.html"},
+{id:"eufonds", n:"EU-Innovations- & Klimafonds", f:"EU Innovation Fund, LIFE und Horizon Europe", lvl:"EU", art:"foerd", cat:"co2", st:"pg", stT:"Programme laufen",
+ d:"Direkte EU-Förderung für Demonstration und Markteinführung kohlenstoffarmer Technologien.",
+ p:["Innovation Fund: finanziert aus ETS-Zertifikaten, Ausschreibungen für Groß- und Pilotprojekte","Auktionen der Europäischen Wasserstoffbank, auch als Dienstleistung für nationale Mittel","LIFE: Kreislaufwirtschaft, Klimaanpassung und Energiewendeprojekte","Horizon Europe, Cluster 5: Forschung bis zur Marktreife für Klima, Energie und Mobilität"],
+ r:"Der Innovationsfonds gehört zu den größten Klimaschutzprogrammen weltweit. Der Clean Industrial Deal bündelt die Instrumente seit 2025 neu.",
+ src:"https://climate.ec.europa.eu/eu-action/eu-funding-climate-action/innovation-fund_en"},
+{id:"kfw", n:"KfW-Förderung", f:"Kreditanstalt für Wiederaufbau – Förderkredite und Zuschüsse für die Energiewende", lvl:"DE", art:"foerd", cat:"eff", st:"ik", stT:"Läuft; Konditionen 2026 angepasst",
+ d:"Zentrale Förderbank des Bundes: zinsgünstige Kredite und Tilgungszuschüsse für Erzeugung, Effizienz und Gebäude.",
+ p:["Programm 270 „Erneuerbare Energien – Standard“: Photovoltaik, Wind, Biogas und Speicher","Programm 293 „Klimaschutzoffensive für Unternehmen“","Programme 296, 297 und 298 „Klimafreundlicher Neubau“","Heizungsförderung für Privatpersonen läuft als Zuschuss über die KfW"],
+ r:"Der Zuschuss 442 „Solarstrom für Elektroautos“ wurde bereits 2024 eingestellt und nicht neu aufgelegt – anderslautende Übersichten sind überholt. Nach dem Förderstopp bis 21.7.2026 gelten reduzierte Sätze; die EH-55-Förderung im Neubau läuft spätestens zum 31.12.2026 aus.",
+ src:"https://www.kfw.de/inlandsfoerderung/Privatpersonen/Neubau/F%C3%B6rderprodukte/Klimafreundlicher-Neubau-Wohngeb%C3%A4ude-(297-298)/"},
+{id:"regfoerd", n:"Landes- & Kommunalförderung", f:"Ergänzende Förderprogramme der Länder und Kommunen", lvl:"DE", art:"foerd", cat:"ee", st:"pg", stT:"Laufend, je nach Bundesland",
+ d:"Schließt Finanzierungslücken zusätzlich zu Bundes- und EU-Mitteln – oft unbürokratisch, aber schnell ausgeschöpft.",
+ p:["Länderprogramme, unter anderem progres.nrw in Nordrhein-Westfalen und SolarPLUS in Berlin","Zuschüsse für Photovoltaik, Batteriespeicher, Steckersolargeräte und Ladeinfrastruktur","Kommunale Programme von Städten, Gemeinden und Stadtwerken","Kumulierbarkeit mit Bundesförderung ist im Einzelfall zu prüfen"],
+ r:"Die Programme sind volatil: Mittel werden häufig unterjährig ausgeschöpft oder ausgesetzt. Vor jeder Investitionsentscheidung ist der aktuelle Stand beim jeweiligen Land abzufragen.",
+ src:"https://www.foerderdatenbank.de/"},
+{id:"steuervorteil", n:"Steuerliche Privilegien", f:"Steuerliche Erleichterungen für Erzeugung, Eigenversorgung und KWK", lvl:"DE", art:"foerd", cat:"co2", st:"ik", stT:"In Kraft",
+ d:"Indirekte Förderung über Steuerbefreiungen und -entlastungen – bei kleinen Anlagen häufig wirksamer als jeder Zuschuss.",
+ p:["§ 3 Nr. 72 EStG: Einkommensteuerbefreiung für Photovoltaik bis 30 kWp je Gebäude, höchstens 100 kWp je Steuerpflichtigem","§ 12 Abs. 3 UStG: Nullsteuersatz auf Lieferung und Installation von PV-Anlagen und Speichern","§ 9 StromStG: Stromsteuerbefreiung für erneuerbaren Strom und Anlagen bis 2 MW","§ 53a EnergieStG: Energiesteuerentlastung für hocheffiziente KWK-Anlagen"],
+ r:"Die Vereinfachungen für kleine PV-Anlagen haben sich etabliert. Streitfragen bleiben bei gemischt genutzten Gebäuden, nachgerüsteten Speichern und Quartierslösungen.",
+ src:"https://www.gesetze-im-internet.de/estg/__3.html"},
+{id:"carbonleak", n:"Carbon-Leakage-Schutz", f:"Freie Zuteilung, Strompreiskompensation und Industriestrompreis", lvl:"DE", art:"foerd", cat:"co2", st:"ik", stT:"In Kraft; SPK 2025–2030 neu geregelt",
+ d:"Instrumente gegen Wettbewerbsnachteile emissionsintensiver Industrien im Emissionshandel.",
+ p:["Freie Zuteilung im EU-ETS nach Benchmarks, für CBAM-Sektoren ab 2026 auslaufend","Strompreiskompensation: Erstattung indirekter CO₂-Kosten über den Strompreis","BECV: nationale Carbon-Leakage-Verordnung zum BEHG","Industriestrompreis als zusätzliche Entlastung seit 2026"],
+ r:"Die EU-Kommission hat am 5.1.2026 überarbeitete Beihilfeleitlinien (C/2026/196) veröffentlicht: 80 % Erstattung für Sektoren der Tabelle 1, 75 % für Tabelle 2, deutlich erweiterter Sektorenkreis, Abrechnungsjahre 2025 bis 2030. Das BMWE hat am 22.5.2026 den Entwurf der neuen Förderrichtlinie vorgelegt.",
+ src:"https://www.dehst.de/DE/Themen/SPK/spk_node.html"},
+{id:"besar", n:"BesAR", f:"Besondere Ausgleichsregelung nach dem Energiefinanzierungsgesetz", lvl:"DE", art:"foerd", cat:"strom", st:"ik", stT:"In Kraft",
+ d:"Begrenzt KWKG- und Offshore-Netzumlage für stromkostenintensive Unternehmen und Schienenbahnen.",
+ p:["Begrenzung auf 15 % der Umlagen, zusätzlich Deckelung an der Bruttowertschöpfung","Voraussetzung: Zugehörigkeit zu einer gelisteten Branche und ausreichende Stromkostenintensität","Pflicht zu einem zertifizierten Energie- oder Umweltmanagementsystem nach ISO 50001 oder EMAS","Antrag jährlich bis zum 30. Juni beim BAFA"],
+ r:"Seit dem Wegfall der EEG-Umlage betrifft die BesAR nur noch KWKG- und Offshore-Netzumlage. Das Strompreispaket 2026 entlastet zusätzlich über Stromsteuer und Netzentgeltzuschuss.",
+ src:"https://www.gesetze-im-internet.de/enfg/"},
+{id:"ghgpcorp", n:"GHG Protocol Corporate Standard", f:"GHG Protocol – Corporate Accounting and Reporting Standard", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig; Überarbeitung läuft",
+ d:"Der weltweit maßgebliche Standard für die Treibhausgasbilanz von Unternehmen und methodische Grundlage von ESRS E1 und SBTi.",
+ p:["Scope 1 direkt, Scope 2 eingekaufte Energie, Scope 3 Wertschöpfungskette","Organisatorische Grenzen: finanzielle Kontrolle, operative Kontrolle oder Kapitalanteil","Basisjahr, Wesentlichkeit und Rekalkulation bei Strukturänderungen","Sieben Kyoto-Gase, umgerechnet in CO₂-Äquivalente"],
+ r:"Die Standardfamilie wird derzeit umfassend überarbeitet. Der konsolidierte Entwicklungsplan (Stand Juli 2026) sieht Veröffentlichungen ab 2027 vor.",
+ src:"https://ghgprotocol.org/corporate-standard"},
+{id:"ghgpscope3", n:"Scope-3-Standard", f:"GHG Protocol – Corporate Value Chain (Scope 3) Accounting and Reporting Standard", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Erweitert die Bilanzierung auf die gesamte Wertschöpfungskette – bei Energieversorgern liegt hier der Großteil der Emissionen.",
+ p:["15 Kategorien, aufgeteilt in Upstream und Downstream","Kategorie 3: brennstoff- und energiebezogene Emissionen außerhalb Scope 1 und 2","Kategorie 11: Nutzung verkaufter Produkte – bei Gasvertrieb die dominante Position","Wesentlichkeitsprüfung je Kategorie, Begründungspflicht bei Ausschluss"],
+ r:"Die Überarbeitung läuft parallel zu Corporate Standard und Scope-2-Guidance; ein zweiter Konsultationsdurchgang war für 2026 angesetzt.",
+ src:"https://ghgprotocol.org/standards/scope-3-standard"},
+{id:"ghgpscope2", n:"Scope 2 Guidance", f:"GHG Protocol – Scope 2 Guidance", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig; Revision in Konsultation",
+ d:"Schreibt die duale Berichterstattung für eingekaufte Energie vor – marktbasiert und standortbasiert. Entscheidet über den Wert von Herkunftsnachweisen und PPAs.",
+ p:["Standortbasierte Methode: Durchschnittsemissionsfaktor des Netzes","Marktbasierte Methode: vertragliche Instrumente wie Herkunftsnachweise und PPAs","Qualitätskriterien (Scope 2 Quality Criteria) für vertragliche Instrumente","Residualmix für nicht durch Verträge gedeckte Mengen"],
+ r:"Die Revision ist der Kern der laufenden GHG-Protocol-Überarbeitung: Diskutiert werden stündliche statt jährlicher Abgleiche und strengere Kriterien für Zusätzlichkeit – mit erheblicher Wirkung auf die Beschaffung von Grünstrom. Erste Konsultation bis 31.1.2026, zweite Runde 2026, finale Fassung als Standard für 2027 erwartet.",
+ src:"https://ghgprotocol.org/scope_2_guidance"},
+{id:"ghgpscope3calc", n:"Scope 3 Calculation Guidance", f:"GHG Protocol – Technical Guidance for Calculating Scope 3 Emissions", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Liefert Berechnungsmethoden und Formeln für jede der 15 Scope-3-Kategorien.",
+ p:["Methodenhierarchie: Primärdaten vor Durchschnitts- und Ausgabendaten","Auswahl geeigneter Emissionsfaktoren und Umgang mit Datenlücken","Proxy-Daten und Hochrechnungen mit Dokumentationspflicht","Praxisbeispiele je Kategorie"],
+ r:"Wird zusammen mit dem Scope-3-Standard überarbeitet.",
+ src:"https://ghgprotocol.org/scope-3-calculation-guidance-2"},
+{id:"ghgpland", n:"Land Sector & Removals", f:"GHG Protocol – Land Sector and Removals Standard", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Regelt die Bilanzierung von Landnutzung, biogenen Emissionen und Kohlenstoffsenken – relevant für Biomasse, Biogas und CDR.",
+ p:["Getrennte Ausweisung biogener CO₂-Emissionen und -Entnahmen","Kriterien für technische und naturbasierte Senken","Anforderungen an Dauerhaftigkeit und Monitoring von Entnahmen","Regeln zu Landnutzungsänderungen in der Lieferkette"],
+ r:"Für Betreiber von Biomasse- und Biogasanlagen der methodische Anschluss an die Nachhaltigkeitsnachweise nach BioSt-NachV.",
+ src:"https://ghgprotocol.org/land-sector-and-removals-guidance"},
+{id:"ghgptools", n:"GHG Protocol Tools", f:"GHG Protocol – Calculation Tools and Guidance", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Die Rechenwerkzeuge der Standardfamilie – für KWK-Betreiber vor allem die Allokationsmethodik zwischen Strom und Wärme.",
+ p:["Stationary Combustion Tool zur Quantifizierung von Scope-1-Emissionen","KWK-Allokation, unter anderem nach Arbeitswert- und Wirkungsgradmethode","Product Life Cycle Standard für den Produkt-Fußabdruck von der Wiege bis zur Bahre","Sektor- und länderspezifische Emissionsfaktoren"],
+ r:"Die Wahl der KWK-Allokationsmethode verschiebt Emissionen deutlich zwischen Strom- und Wärmeprodukt – sie ist offenzulegen und über die Jahre konsistent zu halten.",
+ src:"https://ghgprotocol.org/calculation-tools-and-guidance"},
+{id:"nabisy", n:"Nabisy", f:"Nachhaltige Biomasse: Zertifizierungssysteme und das Nabisy-Register der BLE", lvl:"DE", art:"std", cat:"ee", st:"ik", stT:"In Betrieb",
+ d:"Weist die Nachhaltigkeit von Biomasse nach RED II/III nach – Voraussetzung für Förderung, Steuerentlastung und Nullbewertung im Emissionshandel.",
+ p:["Anerkannte Systeme, unter anderem SURE, REDcert und ISCC","Nachhaltigkeitsnachweise und Teilnachweise im Register der Bundesanstalt für Landwirtschaft und Ernährung","Grundlage der Nullbewertung im EU-ETS und im nationalen Emissionshandel","Ohne Nachweis keine EEG-Vergütung für Biomasse und kein Steuervorteil"],
+ r:"Die Anforderungen an Rückverfolgbarkeit und Massenbilanz sind nach den Betrugsfällen bei Biokraftstoff-Importen deutlich verschärft worden.",
+ src:"https://nabisy.ble.de/app/start"},
+{id:"hknr", n:"HkNR", f:"Herkunftsnachweisregister des Umweltbundesamts", lvl:"DE", art:"std", cat:"ee", st:"ik", stT:"In Betrieb",
+ d:"Das staatliche Register für Herkunftsnachweise – die methodische Grundlage jeder Grünstromkennzeichnung.",
+ p:["Ausstellung, Übertragung und Entwertung von Herkunftsnachweisen","Nur entwertete Nachweise erlauben die Kennzeichnung als Grünstrom","Verhindert Doppelzählung; kein Nachweis für EEG-geförderten Strom","Ausweitung auf Gas, Wasserstoff, Wärme und Kälte im Aufbau"],
+ r:"Für die marktbasierte Scope-2-Bilanzierung ist die Entwertung im HkNR der übliche Nachweis. Die laufende Revision der Scope 2 Guidance könnte die Anforderungen an solche Instrumente verschärfen.",
+ src:"https://www.hknr.de/Uba"},
+{id:"h2zert", n:"H₂-Zertifikate", f:"Privatrechtliche Zertifizierungssysteme für Wasserstoff (CertifHy, TÜV SÜD CMS 70)", lvl:"INT", art:"std", cat:"gas", st:"ik", stT:"Am Markt etabliert",
+ d:"Ergänzen die staatlichen RFNBO-Kriterien um handelbare Marktsignale für Herkunft und CO₂-Fußabdruck von Wasserstoff und Derivaten.",
+ p:["CertifHy: europäisches Herkunftsnachweissystem für grünen und kohlenstoffarmen Wasserstoff","TÜV SÜD CMS 70: Standard für grünen Wasserstoff mit Anforderungen an Strombezug und Anlagenalter","Basis für freiwillige Klimaziele und industrielle Abnahmeverträge","Abgrenzung zu den verbindlichen RFNBO- und Low-Carbon-Kriterien der EU beachten"],
+ r:"Mit der Delegierten Verordnung (EU) 2025/2359 und dem Aufbau des EU-Zertifizierungsrahmens verschiebt sich das Gewicht von privaten Labeln hin zu regulierten Nachweisen.",
+ src:"https://www.certifhy.eu/"},
+{id:"edifact", n:"EDIFACT", f:"Energiewirtschaftliche Nachrichtenformate (UN/EDIFACT) für die Marktkommunikation", lvl:"DE", art:"std", cat:"mako", st:"ik", stT:"In Nutzung; Ablösung läuft",
+ d:"Die Nachrichtenformate der deutschen Marktkommunikation – Grundlage jeder Abrechnung und Bilanzierung.",
+ p:["MSCONS für Zählerstände und Lastgänge, UTILMD für Stammdaten, INVOIC für Rechnungen","APERAK und CONTRL als Rückmeldungen, ORDERS für Bestellprozesse","Formatversionen und Anwendungshandbücher werden vom BDEW gepflegt","Verbindliche Umstellungstermine jeweils zum 1. April und 1. Oktober"],
+ r:"EDIFACT stößt bei Volumen und Geschwindigkeit an Grenzen. Die Bundesnetzagentur stellt die Prozesse schrittweise auf JSON-Schnittstellen um; verbindliche Releases 2026 zum 1.4. und 1.10.",
+ src:"https://www.bdew-mako.de/"},
+{id:"makostd", n:"MaKo-Standards", f:"Marktkommunikation: AS4, CIM, GPKE/GeLi Gas, TR-03109 und TASE.2", lvl:"DE", art:"std", cat:"mako", st:"ik", stT:"In Kraft; Umstellung 2026",
+ d:"Die technische und prozessuale Klammer der Marktkommunikation – vom Übertragungsweg bis zur Steuerbox beim Kunden.",
+ p:["AS4 als verbindlicher Übertragungsweg im Strommarkt seit 1.4.2024 (Festlegung BK6-21-282)","CIM nach IEC 61970/61968 als Datenmodell, unter anderem für Redispatch 2.0","GPKE und GeLi Gas als Geschäftsprozesse der Bundesnetzagentur","TR-03109 für das Smart-Meter-Gateway mit HAN- und LMN-Schnittstellen; TASE.2 für den Leitstellenaustausch"],
+ r:"Mit der Festlegung BK6-22-024 werden Prozesse schrittweise auf APIs umgestellt. Für alle Marktteilnehmer verbindlich sind die Releases zum 1.4. und 1.10.2026.",
+ src:"https://www.bdew-mako.de/"},
+{id:"vdear", n:"VDE-Anwendungsregeln", f:"VDE-AR-N 4100 bis 4130 – Technische Anschlussregeln", lvl:"DE", art:"std", cat:"mako", st:"ik", stT:"In Kraft",
+ d:"Regeln den Anschluss und Betrieb von Erzeugungsanlagen und Speichern am Netz – für jede Anlagenanmeldung verbindlich.",
+ p:["VDE-AR-N 4105: Niederspannung, Anlagen bis 135 kW Anschlussleistung","VDE-AR-N 4110: Mittelspannung, 4120: Hochspannung, 4130: Höchstspannung","Vorgaben zu Blindleistungsbereitstellung, Netz- und Anlagenschutz sowie Frequenzverhalten","Steuerbarkeit und Schnittstellen zum Netzbetreiber, Zertifikate nach Anlagen- und Einheitenzertifizierung"],
+ r:"Die Anpassung an § 14a EnWG (steuerbare Verbrauchseinrichtungen) und an die Anforderungen an netzbildende Wechselrichter (grid forming) ist in Arbeit.",
+ src:"https://www.vde.com/de/fnn/arbeitsgebiete/tar"},
+{id:"dvgw", n:"DVGW-Regelwerk", f:"Technische Regeln des DVGW für Gas- und Wasserstoffinfrastruktur", lvl:"DE", art:"std", cat:"mako", st:"ik", stT:"In Kraft",
+ d:"Das anerkannte Regelwerk für den sicheren Bau und Betrieb der Gasinfrastruktur – Maßstab für die allgemein anerkannten Regeln der Technik.",
+ p:["G 260: Gasbeschaffenheit, Grundlage für Einspeisung von Biomethan und Wasserstoff","G 262: Nutzung von Gasen aus regenerativen Quellen","Regeln zu Bau, Betrieb und Instandhaltung von Leitungen und Anlagen","H2-Readiness: Prüf- und Umstellungsregeln für Wasserstoff im Bestandsnetz"],
+ r:"Der DVGW arbeitet an der Anpassung des Regelwerks für reine Wasserstoffnetze; das Wasserstoff-Kernnetz und die EnWG-Novelle 2026 setzen den Rahmen.",
+ src:"https://www.dvgw.de/themen/regelwerk"},
+{id:"sbtipower", n:"SBTi Power Sector", f:"Science Based Targets initiative – Power Sector Guidance", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Sektorpfad für Energieversorger: zulässige Emissionsintensität der Stromerzeugung auf dem Weg zur Klimaneutralität.",
+ p:["Sectoral Decarbonization Approach zur Berechnung der zulässigen Intensität in g CO₂ je kWh","Meilensteine für den Kohleausstieg","Vollständige Dekarbonisierung der Stromerzeugung bis 2035 in fortgeschrittenen Volkswirtschaften","Getrennte Pfade für Erzeugung und für Vertrieb bzw. Handel"],
+ r:"Mit dem Corporate Net-Zero Standard V2.0 werden die Sektorleitfäden schrittweise angepasst.",
+ src:"https://sciencebasedtargets.org/sectors/power"},
+{id:"sbtinz", n:"SBTi Net-Zero Standard", f:"SBTi Corporate Net-Zero Standard, Version 2.0", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"V2.0 seit 11.6.2026",
+ d:"Der Rahmen für wissenschaftsbasierte Netto-Null-Ziele von Unternehmen – de facto Marktstandard für Klimaziele.",
+ p:["Mindestens 90 % Emissionsreduktion über die gesamte Wertschöpfungskette bis spätestens 2050","Trennung von kurzfristigen Reduktionszielen (5 bis 10 Jahre) und finaler Neutralisierung","Restemissionen nur über dauerhafte Entnahmen neutralisierbar","V2.0 mit erweitertem Instrumentarium und differenzierten Anforderungen je Unternehmensgröße"],
+ r:"Version 2.0 wurde am 11.6.2026 veröffentlicht. Im Jahr 2026 gilt für die Zielvalidierung weiterhin V1.3.1; ab dem ersten Quartal 2027 sind beide Fassungen möglich, ab 1.2.2028 ist V2.0 verbindlich.",
+ src:"https://sciencebasedtargets.org/net-zero"},
+{id:"sbtibvcm", n:"SBTi BVCM", f:"SBTi – Beyond Value Chain Mitigation", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Fordert Klimaschutzbeiträge außerhalb der eigenen Wertschöpfungskette – zusätzlich zu, nicht anstelle von eigenen Reduktionen.",
+ p:["Investitionen in hochwertige Carbon Credits oder CDR-Technologien","Ausdrücklich kein Ersatz für Reduktionen in Scope 1 bis 3","Empfohlene Orientierung an einem internen CO₂-Preis","Transparente Berichterstattung getrennt von der eigenen Bilanz"],
+ r:"Die Rolle von Carbon Credits wurde im Zuge des Net-Zero Standard V2.0 neu justiert.",
+ src:"https://sciencebasedtargets.org/beyond-value-chain-mitigation"},
+{id:"gri", n:"GRI", f:"Global Reporting Initiative – GRI Standards", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig",
+ d:"Der globale Berichtsstandard für Nachhaltigkeit, in der EU durch die ESRS in den Hintergrund gerückt, international weiter relevant.",
+ p:["Universal Standards, Sektor- und Themenstandards","Impact-Wesentlichkeit statt doppelter Wesentlichkeit","Weitgehend harmonisiert mit den ESRS, Interoperabilitätsindex vorhanden","Für Unternehmen mit außereuropäischen Stakeholdern die Brücke zur globalen Anschlussfähigkeit"],
+ r:"Mit der Vereinfachung der ESRS wächst die Bedeutung freiwilliger Rahmenwerke für Unternehmen, die aus dem CSRD-Anwendungsbereich fallen.",
+ src:"https://www.globalreporting.org/"},
+{id:"iso50001", n:"ISO 50001", f:"DIN EN ISO 50001 – Energiemanagementsysteme", lvl:"INT", art:"std", cat:"eff", st:"ik", stT:"Fassung 2018 gültig",
+ d:"Die Norm für systematisches Energiemanagement – in Deutschland Voraussetzung für zahlreiche Entlastungen.",
+ p:["PDCA-Zyklus mit energetischer Ausgangsbasis, Leistungskennzahlen und kontinuierlicher Verbesserung","Voraussetzung für die Besondere Ausgleichsregelung und den Spitzenausgleich","Erfüllungsoption für Pflichten nach EnEfG und EDL-G","Alternative für kleinere Unternehmen: Energieaudit nach DIN EN 16247-1"],
+ r:"Das Energieeffizienzgesetz verpflichtet Unternehmen ab 7,5 GWh Jahresenergieverbrauch zu einem Energie- oder Umweltmanagementsystem; die EnEfG-Novelle 2026 justiert die Schwellen nach.",
+ src:"https://www.iso.org/iso-50001-energy-management.html"},
+{id:"iso14001", n:"ISO 14001 / EMAS", f:"DIN EN ISO 14001 und EMAS-Verordnung (EG) Nr. 1221/2009", lvl:"INT", art:"std", cat:"nachhalt", st:"ik", stT:"Gültig; ISO-Revision läuft",
+ d:"Umweltmanagementsysteme als Rahmen für Rechtskonformität, Umweltleistung und Ressourceneffizienz.",
+ p:["ISO 14001: international anerkannter Managementsystem-Standard","EMAS: EU-System mit zusätzlicher Umwelterklärung, externer Validierung und Registrierung","Beide gelten als Nachweis für die Besondere Ausgleichsregelung","Anschlussfähig an ISO 50001 über die gemeinsame Grundstruktur"],
+ r:"Die IED-Novelle macht ein Umweltmanagementsystem für große Industrieanlagen verpflichtend – ISO 14001 und EMAS werden damit vom freiwilligen zum faktisch geforderten Instrument. Die Revision der ISO 14001 läuft.",
+ src:"https://www.iso.org/iso-14001-environmental-management.html"}
 ];
 const E = [
  ["euklg","ff55","bezug","operationalisiert Ziele"],
@@ -947,9 +1310,136 @@ const E = [
  ["stromvkg","kwkg","bezug","H₂-ready-Kraftwerke"],
  ["behg","tehg","bezug","nEHS ↔ EU-ETS"],
  ["vnp","enwg","aenderung","geplante Änderungen"],
- ["lngg","ensig","bezug","Versorgungssicherheit Gas"]
+ ["lngg","ensig","bezug","Versorgungssicherheit Gas"],
+/* --- EU: Nachhaltigkeitsberichterstattung --- */
+ ["csrd","esrs","bezug","Standards zur Richtlinie"],
+ ["csrd","taxvo","bezug","Taxonomie-Angaben im Bericht"],
+ ["csrd","sfdr","bezug","Datengrundlage für den Finanzmarkt"],
+ ["taxvo","sfdr","bezug","Kriterien für nachhaltige Produkte"],
+ ["csddd","csrd","bezug","gemeinsam durch Omnibus I geändert"],
+ ["csrd","hgbnach","umsetzung","Umsetzung im HGB"],
+ ["esrs","hgbnach","bezug","anzuwendende Standards"],
+ ["csddd","lksg","umsetzung","löst das LkSG ab 26.7.2027 ab"],
+ ["esrs","ghgpcorp","bezug","methodische Grundlage"],
+ ["gri","esrs","bezug","harmonisiert mit den ESRS"],
+ /* --- EU: Rohstoffe und Kreislauf --- */
+ ["crma","nzia","bezug","Rohstoffe für Netto-Null-Technologien"],
+ ["crma","battvo","bezug","Rohstoffe und Recycling"],
+ ["abfrrl","krwg","umsetzung","Umsetzung im KrWG"],
+ ["abfrrl","battvo","bezug","Abfallrecht für Altbatterien"],
+ /* --- EU: Wasserstoff --- */
+ ["rfnbo","red3","bezug","konkretisiert die RED-Quoten"],
+ ["h2lc","gasrl","bezug","Art. 9 Abs. 5 der Richtlinie"],
+ ["rfnbo","h2lc","bezug","erneuerbar gegenüber kohlenstoffarm"],
+ ["h2zert","rfnbo","bezug","privatrechtliche Ergänzung"],
+ ["h2zert","h2lc","bezug","Abgrenzung zu regulierten Nachweisen"],
+ /* --- EU: Emissionshandel und Netzbetrieb --- */
+ ["mvo","ets1","bezug","Überwachung im EU-ETS"],
+ ["mvo","tehg","bezug","Vollzug durch die DEHSt"],
+ ["sogl","stromvo","bezug","Netzbetrieb im Binnenmarkt"],
+ ["ervo","sogl","bezug","Notzustand und Wiederaufbau"],
+ ["sosgas","gassp","bezug","Speicherfüllstände"],
+ ["sosgas","gasvo","bezug","Versorgungssicherheit Gas"],
+ /* --- EU: Anlagen und Genehmigung --- */
+ ["ied","bimschg","umsetzung","Umsetzung bis 1.7.2026"],
+ ["ied","whg","umsetzung","Anpassung im Wasserrecht"],
+ ["ied","krwg","umsetzung","Anpassung im Abfallrecht"],
+ ["ied","bimschv1344","bezug","BVT-Schlussfolgerungen"],
+ ["uvpd","bimschg","bezug","UVP im Genehmigungsverfahren"],
+ ["uvpd","nabeg","bezug","Planfeststellung"],
+ ["uvpd","ied","bezug","gemeinsames Zulassungsverfahren"],
+ /* --- DE: Netzentgelte und Regulierung --- */
+ ["stromnev","enwg","bezug","Entgeltregulierung Strom"],
+ ["stromnev","agnes","aenderung","Neuordnung per Festlegung"],
+ ["stromnev","enfg","bezug","§ 19-Umlage"],
+ ["gasnev","enwg","bezug","Entgeltregulierung Gas"],
+ ["aregv","enwg","bezug","Erlösobergrenzen"],
+ ["aregv","stromnev","bezug","Kalkulationsgrundlage"],
+ ["aregv","gasnev","bezug","Kalkulationsgrundlage"],
+ ["bbplg","nabeg","bezug","Bedarf und Verfahren"],
+ ["bbplg","tene","bezug","PCI-Vorhaben"],
+ /* --- DE: Marktkommunikation und IT --- */
+ ["mabis","enwg","bezug","Bilanzkreisregeln"],
+ ["mabis","msbg","bezug","Messwerte aus dem Messstellenbetrieb"],
+ ["mabis","edifact","bezug","Nachrichtenformate"],
+ ["gabigas","enwg","bezug","Bilanzierung Gas"],
+ ["gabigas","edifact","bezug","Nachrichtenformate"],
+ ["edifact","makostd","bezug","Formate und Übertragungswege"],
+ ["makostd","msbg","bezug","Smart-Meter-Gateway (TR-03109)"],
+ ["makostd","bsig","bezug","IT-Sicherheitsanforderungen"],
+ ["bsig","kritisv","bezug","Schwellenwerte der Anlagen"],
+ ["bsig","enwg","bezug","IT-Sicherheitskatalog § 11 EnWG"],
+ ["bsig","msbg","bezug","Sicherheit im Messstellenbetrieb"],
+ ["vdear","msbg","bezug","Steuerbarkeit nach § 14a EnWG"],
+ ["vdear","eeg","bezug","technische Anschlussbedingungen"],
+ ["dvgw","h2netz","bezug","technische Regeln für H₂-Netze"],
+ ["dvgw","enwg","bezug","anerkannte Regeln der Technik"],
+ /* --- DE: Erneuerbare, Biomasse, Nachweise --- */
+ ["hkrndv","eeg","bezug","Doppelvermarktungsverbot"],
+ ["hkrndv","hknr","bezug","Register zur Verordnung"],
+ ["biomassev","eeg","bezug","Biomassebegriff des EEG"],
+ ["biostnachv","biomassev","bezug","Nachhaltigkeitsanforderungen"],
+ ["biostnachv","nabisy","bezug","Nachweis im Register"],
+ ["biostnachv","red3","umsetzung","RED-Nachhaltigkeitskriterien"],
+ /* --- DE: Kohle, Steuern, KWK --- */
+ ["kvbg","stromvkg","bezug","Ersatz für Kohlekapazität"],
+ ["kvbg","ets1","bezug","Löschung von Zertifikaten"],
+ ["energiestg","kwkg","bezug","§ 53a Entlastung für KWK"],
+ ["energiestg","etd","umsetzung","EU-Energiesteuerrahmen"],
+ ["stromstg","etd","umsetzung","EU-Mindeststeuersätze"],
+ ["stromstg","strompaket","aenderung","Absenkung ab 2026"],
+ ["stromstv","stromstg","bezug","Durchführungsvorschriften"],
+ ["kwkausv","kwkg","bezug","Ausschreibungen zum KWKG"],
+ /* --- DE: Grundversorgung und Anlagenrecht --- */
+ ["gasgvv","enwg","bezug","Grundversorgung Gas"],
+ ["stromgvv","enwg","bezug","Grundversorgung Strom"],
+ ["stromgvv","stromrl","umsetzung","Verbraucherrechte"],
+ ["bimschv1344","bimschg","bezug","Verordnung zum BImSchG"],
+ ["bimschv17","bimschg","bezug","Verordnung zum BImSchG"],
+ ["bimschv1344","kwkg","bezug","Grenzwerte für BHKW"],
+ ["bimschv17","krwg","bezug","Abfallverbrennung"],
+ ["whg","bimschg","bezug","paralleles Zulassungsrecht"],
+ /* --- Förderungen --- */
+ ["foerdeegkwkg","eeg","bezug","Vergütung nach dem EEG"],
+ ["foerdeegkwkg","kwkg","bezug","Zuschläge nach dem KWKG"],
+ ["foerdeegkwkg","solarsp","aenderung","keine Förderung bei negativen Preisen"],
+ ["regfoerd","foerdeegkwkg","bezug","ergänzt die Bundesförderung"],
+ ["ccfd","ets1","bezug","sichert den CO₂-Preis ab"],
+ ["ccfd","cid","bezug","Instrument des Clean Industrial Deal"],
+ ["h2foerd","h2netz","bezug","flankiert das Kernnetz"],
+ ["h2foerd","rfnbo","bezug","Förderfähigkeit nach RFNBO"],
+ ["h2foerd","eufonds","bezug","Auktionen der Wasserstoffbank"],
+ ["bafa","enefg","bezug","Effizienzmaßnahmen"],
+ ["bafa","edlg","bezug","Energieaudits und Beratung"],
+ ["bafa","wpg","bezug","BEW für Wärmenetze"],
+ ["kfw","gmodg","bezug","Heizungsförderung"],
+ ["kfw","geg","bezug","Gebäudestandards"],
+ ["eufonds","ets1","bezug","Finanzierung aus Zertifikaten"],
+ ["steuervorteil","stromstg","bezug","Stromsteuerbefreiungen"],
+ ["steuervorteil","energiestg","bezug","Energiesteuerentlastung"],
+ ["carbonleak","ets1","bezug","freie Zuteilung"],
+ ["carbonleak","cbam","bezug","Ablösung der freien Zuteilung"],
+ ["carbonleak","strompaket","bezug","Industriestrompreis"],
+ ["besar","enfg","bezug","geregelt im EnFG"],
+ ["besar","iso50001","bezug","Managementsystem als Voraussetzung"],
+ /* --- Standards --- */
+ ["ghgpcorp","ghgpscope2","bezug","Ergänzung für Scope 2"],
+ ["ghgpcorp","ghgpscope3","bezug","Ergänzung für Scope 3"],
+ ["ghgpscope3","ghgpscope3calc","bezug","Berechnungsleitfaden"],
+ ["ghgpcorp","ghgpland","bezug","Landnutzung und Senken"],
+ ["ghgpcorp","ghgptools","bezug","Rechenwerkzeuge"],
+ ["ghgpscope2","hknr","bezug","Herkunftsnachweise als Instrument"],
+ ["ghgptools","kwkg","bezug","KWK-Allokation Strom und Wärme"],
+ ["ghgpland","biostnachv","bezug","biogene Emissionen"],
+ ["sbtinz","ghgpcorp","bezug","baut auf dem GHG Protocol auf"],
+ ["sbtinz","sbtipower","bezug","Sektorpfad Energie"],
+ ["sbtinz","sbtibvcm","bezug","Beiträge außerhalb der Kette"],
+ ["iso50001","enefg","bezug","Erfüllungsoption"],
+ ["iso14001","ied","bezug","Umweltmanagement für Anlagen"],
+ ["iso14001","iso50001","bezug","gemeinsame Grundstruktur"]
 ];
 /* ================= AUFBAU ================= */
+N.forEach(n=>{ if(!n.art) n.art="recht"; });   /* Rechtsakt ist der Normalfall */
 const nodeMap={}; N.forEach(n=>nodeMap[n.id]=n);
 const degree={}; N.forEach(n=>degree[n.id]=0);
 E.forEach(e=>{degree[e[0]]++;degree[e[1]]++;});
@@ -957,22 +1447,24 @@ N.forEach(n=>{
   n.deg=degree[n.id]; n.hub=n.deg>=6;
   n.fs=n.hub?12.5:11.5;
   const tw=Math.ceil(n.n.length*n.fs*0.60);
-  n.w=12+9+8+tw+8+16+8+8+12;  /* Pad·Punkt·Gap·Text·Gap·Ebene·Gap·Status·Pad */
+  n.w=12+9+8+tw+8+21+8+8+12;  /* Pad·Punkt·Gap·Text·Gap·Ebene·Gap·Status·Pad */
   n.h=n.hub?36:30;
-  n.r=n.w/2;
+  n.rad=n.w/2;   /* NICHT n.r – das Feld trägt den Text „Aktuell" aus den Daten. */
 });
-document.getElementById("chipcount").textContent = N.length+" Rechtsakte · "+E.length+" Verknüpfungen";
+document.getElementById("chipcount").textContent = N.length+" Einträge · "+E.length+" Verknüpfungen";
 
 /* ---- Force-Layout (neuronale Anordnung) ---- */
-const catOrder=["klima","strom","ee","netz","gas","waerme","eff","co2"];
+const catOrder=["klima","strom","ee","netz","gas","waerme","eff","co2","nachhalt","rohstoff","mako","genehm"];
 const anchors={};
+/* Ring-Radius wächst mit der Zahl der Themenfelder, sonst klebt alles aufeinander. */
+const RX=Math.max(560, catOrder.length*88), RY=Math.max(420, catOrder.length*66);
 catOrder.forEach((c,i)=>{
   const a=-Math.PI/2 + i*(2*Math.PI/catOrder.length);
-  anchors[c]={x:Math.cos(a)*560, y:Math.sin(a)*420};
+  anchors[c]={x:Math.cos(a)*RX, y:Math.sin(a)*RY};
 });
 N.forEach((n,i)=>{
   const a=anchors[n.cat], j=i*2.399;
-  n.x=a.x+Math.cos(j)*90*Math.random(); n.y=a.y+Math.sin(j)*90*Math.random();
+  n.x=a.x+Math.cos(j)*150*Math.random(); n.y=a.y+Math.sin(j)*150*Math.random();
 });
 (function simulate(){
   const ITER=850;
@@ -1003,7 +1495,7 @@ N.forEach((n,i)=>{
     }
   }
   /* Überlappungen auflösen (Platz für Labels) */
-  for(let k=0;k<260;k++){
+  for(let k=0;k<520;k++){
     let moved=false;
     for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){
       const a=N[i],b=N[j];
@@ -1063,7 +1555,7 @@ N.forEach(n=>{
   el("circle",{class:"cdot",cx:-n.w/2+16,cy:0,r:4.2},inner);
   const tx=el("text",{class:"nm",x:-n.w/2+28,y:n.fs*0.36},inner);
   tx.textContent=n.n; tx.setAttribute("style","font-size:"+n.fs+"px");
-  const lv=el("text",{class:"lvlt",x:n.w/2-33,y:3.4},inner); lv.textContent=n.lvl;
+  const lv=el("text",{class:"lvlt",x:n.w/2-38,y:3.4},inner); lv.textContent=n.lvl;
   el("circle",{class:"sdot2",cx:n.w/2-14,cy:0,r:3.8},inner);
   nodeEls[n.id]=g;
   g.addEventListener("pointerenter",()=>hover(n.id,true));
@@ -1256,7 +1748,8 @@ function showTip(n){
   tip.innerHTML=`<div class="tbar" style="background:${CATS[n.cat].c}"></div><div class="tin">
    <h4>${n.n}</h4><div class="tf">${n.f}</div>
    <div class="trow">
-     <span class="tb ${n.lvl==="EU"?"lvl-eu":"lvl-de"}">${n.lvl==="EU"?"🇪🇺 EU":"🇩🇪 DE"}</span>
+     <span class="tb lvl-${n.lvl.toLowerCase()}">${LVLS[n.lvl].i} ${LVLS[n.lvl].s}</span>
+     <span class="tb" style="--c:${CATS[n.cat].c}">${ARTS[n.art].i} ${ARTS[n.art].t}</span>
      <span class="tb" style="--c:${STATUS[n.st].c}">${STATUS[n.st].t}</span>
    </div>
    <div class="td">${n.d}</div>
@@ -1264,7 +1757,7 @@ function showTip(n){
    <div class="th">Klicken für Details, Kennzahlen &amp; Quellen</div></div>`;
   const r=svg.getBoundingClientRect();
   const sx=r.left+(n.x-vb.x)/vb.w*r.width, sy=r.top+(n.y-vb.y)/vb.h*r.height;
-  const sr=(n.r+16)/vb.w*r.width;
+  const sr=(n.rad+16)/vb.w*r.width;
   let x=sx+sr+14, y=sy-50;
   if(x+286>innerWidth) x=sx-286-sr-2;
   y=Math.max(14,Math.min(y,innerHeight-290));
@@ -1314,7 +1807,8 @@ function select(id){
     <h2>${n.n}</h2>
     <div class="full">${n.f}</div>
     <div class="tiles">
-      <div class="tile tinted" style="--c:${n.lvl==="EU"?"var(--strom)":"var(--waerme)"}"><b>${n.lvl==="EU"?"🇪🇺":"🇩🇪"}</b><span>${n.lvl==="EU"?"EU-Ebene":"Deutschland"}</span></div>
+      <div class="tile tinted" style="--c:${n.lvl==="EU"?"var(--strom)":n.lvl==="DE"?"var(--waerme)":"var(--eff)"}"><b>${LVLS[n.lvl].i}</b><span>${LVLS[n.lvl].t}</span></div>
+      <div class="tile tinted" style="--c:${CATS[n.cat].c}"><b>${ARTS[n.art].i}</b><span>${ARTS[n.art].t}</span></div>
       <div class="tile tinted" style="--c:${STATUS[n.st].c}"><b class="stt">${STATUS[n.st].t}</b><span>Status</span></div>
       <div class="tile"><b>${degree[n.id]}</b><span>Verknüpfungen</span></div>
     </div>
@@ -1323,13 +1817,13 @@ function select(id){
     ${(n.kpi&&n.kpi.length)?`<h3>Relevante Kennzahlen</h3><div class="kgrid">${n.kpi.map(x=>`<div class="kpi"><b>${x.v}</b><span>${x.l}</span></div>`).join("")}</div>`:""}
     <h3>Kernpunkte</h3>
     <ul style="--dotc:${CATS[n.cat].c}">${n.p.map(x=>`<li>${x}</li>`).join("")}</ul>
-    <h3>Aktuell · Stand Juli 2026</h3>
+    <h3>Aktuell · Stand August 2026</h3>
     <p>${n.r}</p>
     <h3>Verknüpfungen</h3>
     <div>${rels.map(r=>`<span class="relchip" data-go="${r.other}" tabindex="0" role="button"><span class="rdot" style="--c:${CATS[nodeMap[r.other].cat].c}"></span>${nodeMap[r.other].n}<span class="rl">${r.dir} ${r.lab}</span></span>`).join("")||"–"}</div>
     <h3>Offizielle Dokumente &amp; Quellen</h3>
     <div>${docs.map(l=>`<a class="doclink" href="${l.u}" target="_blank" rel="noopener"><span class="ic">${l.u.includes("eur-lex")?"🇪🇺":l.u.includes("gesetze-im-internet")?"§":"🔗"}</span><span>${l.t}<span class="u">${l.u.replace(/^https?:\/\/(www\.)?/,"").slice(0,58)}</span></span></a>`).join("")}</div>
-    <div class="vfoot"><img src="data:image/png;base64,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" alt="Vroni prüft"><div><b>Von Vroni geprüft</b> · Stand: 31. Juli 2026 · nächster Fakten-Check: Montag.<br>Angaben ohne Gewähr – keine Rechtsberatung.</div></div>`;
+    <div class="vfoot"><img src="data:image/png;base64,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" alt="Vroni prüft"><div><b>Von Vroni geprüft</b> · Stand: 2. August 2026 · nächster Fakten-Check: Montag.<br>Angaben ohne Gewähr – keine Rechtsberatung.</div></div>`;
   pc.querySelectorAll(".relchip").forEach(c=>{
     c.addEventListener("click",()=>select(c.dataset.go));
     c.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();select(c.dataset.go);} });
@@ -1350,7 +1844,7 @@ addEventListener("keydown",e=>{
   if(e.key==="t"||e.key==="T"){e.preventDefault();toggleTheme();}
 });
 /* ---- Filter / Suche / Sidebar ---- */
-const activeCats=new Set(catOrder), activeLvls=new Set(["EU","DE"]);
+const activeCats=new Set(catOrder), activeLvls=new Set(["EU","DE","INT"]), activeArts=new Set(["recht","foerd","std"]);
 const catsDiv=document.getElementById("cats");
 catOrder.forEach(c=>{
   const cnt=N.filter(n=>n.cat===c).length;
@@ -1363,9 +1857,11 @@ catOrder.forEach(c=>{
   d.addEventListener("pointerleave",()=>{ if(selId)return; setFocus(null); });
   catsDiv.appendChild(d);
 });
+/* Eine Knopfreihe für Ebene (data-lvl) und eine für Art (data-art) – gleiche Optik, gleiche Logik. */
 document.querySelectorAll(".lvl").forEach(b=>b.addEventListener("click",()=>{
-  const l=b.dataset.lvl; activeLvls.has(l)?activeLvls.delete(l):activeLvls.add(l);
-  b.classList.toggle("on",activeLvls.has(l)); applyFilters();
+  const key=b.dataset.lvl||b.dataset.art, set=b.dataset.lvl?activeLvls:activeArts;
+  set.has(key)?set.delete(key):set.add(key);
+  b.classList.toggle("on",set.has(key)); applyFilters();
 }));
 const searchIn=document.getElementById("search"), resDiv=document.getElementById("results");
 let searchT=null;
@@ -1384,7 +1880,8 @@ function renderResults(){
 document.getElementById("resetbtn").addEventListener("click",()=>{
   searchIn.value=""; resDiv.innerHTML="";
   activeCats.clear(); catOrder.forEach(c=>activeCats.add(c));
-  activeLvls.add("EU"); activeLvls.add("DE");
+  ["EU","DE","INT"].forEach(l=>activeLvls.add(l));
+  ["recht","foerd","std"].forEach(a=>activeArts.add(a));
   document.querySelectorAll(".cat").forEach(c=>c.classList.remove("off"));
   document.querySelectorAll(".lvl").forEach(b=>b.classList.add("on"));
   deselect(); applyFilters(); fitAll(true);
@@ -1402,7 +1899,7 @@ function applyFilters(){
   const q=searchIn.value.trim().toLowerCase();
   N.forEach(n=>{
     const g=nodeEls[n.id];
-    const vis=activeCats.has(n.cat)&&activeLvls.has(n.lvl);
+    const vis=activeCats.has(n.cat)&&activeLvls.has(n.lvl)&&activeArts.has(n.art);
     g.style.display=vis?"":"none";
     if(q&&vis){
       const hit=(n.n+" "+n.f+" "+n.d).toLowerCase().includes(q);
@@ -1410,7 +1907,7 @@ function applyFilters(){
     } else if(!selId){ g.classList.remove("hit","dim"); }
   });
   edges.forEach(ed=>{
-    const vis=activeCats.has(ed.a.cat)&&activeCats.has(ed.b.cat)&&activeLvls.has(ed.a.lvl)&&activeLvls.has(ed.b.lvl);
+    const vis=[ed.a,ed.b].every(n=>activeCats.has(n.cat)&&activeLvls.has(n.lvl)&&activeArts.has(n.art));
     ed.el.style.display=vis?"":"none";
     ed.pulse.style.display=vis?"":"none";
     ed.hidden=!vis;
@@ -1469,7 +1966,44 @@ wpg:{kpi:[{v:"30.6.2026",l:"Frist Wärmeplan Großstädte"},{v:"30.6.2028",l:"Fr
 enefg:{kpi:[{v:"−26,5 %",l:"Endenergie 2030 ggü. 2008"},{v:"7,5 GWh",l:"Schwelle EnMS/UMS-Pflicht"},{v:"24.6.2026",l:"Novelle im Kabinett"}],links:[{t:"BfEE – Bundesstelle für Energieeffizienz",u:"https://www.bfee-online.de"}]},
 edlg:{kpi:[{v:"4 Jahre",l:"Energieaudit-Turnus"},{v:"2026",l:"Novelle gemeinsam mit EnEfG"}],links:[{t:"BAFA – Energieaudits",u:"https://www.bafa.de"}]},
 behg:{kpi:[{v:"55–65 €/t",l:"CO₂-Preiskorridor 2026"},{v:"2026",l:"letztes nEHS-Abgabejahr"}],links:[{t:"DEHSt – nationaler Emissionshandel (nEHS)",u:"https://www.dehst.de/DE/Themen/nEHS/nehs_node.html"}]},
-tehg:{kpi:[{v:"DEHSt",l:"Vollzugsbehörde"},{v:"2005",l:"EU-ETS-Start"}],links:[{t:"DEHSt – Deutsche Emissionshandelsstelle",u:"https://www.dehst.de"}]}
+tehg:{kpi:[{v:"DEHSt",l:"Vollzugsbehörde"},{v:"2005",l:"EU-ETS-Start"}],links:[{t:"DEHSt – Deutsche Emissionshandelsstelle",u:"https://www.dehst.de"}]},
+/* --- neue EU-Rechtsakte --- */
+  crma:{kpi:[{v:"10 / 40 / 25 %",l:"Abbau / Verarbeitung / Recycling bis 2030"},{v:"65 %",l:"Höchstanteil eines Drittlands"},{v:"27 Monate",l:"Genehmigung strategischer Projekte"}],links:[{t:"EU-Kommission – Critical Raw Materials Act",u:"https://single-market-economy.ec.europa.eu/sectors/raw-materials/areas-specific-interest/critical-raw-materials_en"}]},
+  rfnbo:{kpi:[{v:"36 Monate",l:"max. Altersabstand EE-Anlage"},{v:"ab 2030",l:"stundenscharfe Korrelation"},{v:"90 %",l:"EE-Anteil für Netzstrom-Ausnahme"}],links:[{t:"Delegierte VO (EU) 2023/1185 – 70-%-Methodik",u:"https://eur-lex.europa.eu/eli/reg_del/2023/1185/oj"}]},
+  h2lc:{kpi:[{v:"70 %",l:"Mindest-THG-Minderung"},{v:"28,2 g",l:"CO₂-Äq. je MJ"},{v:"21.11.2025",l:"im Amtsblatt"}],links:[]},
+  csrd:{kpi:[{v:"> 1.000",l:"Beschäftigte (Omnibus I)"},{v:"26.2.2026",l:"RL (EU) 2026/470 im Amtsblatt"}],links:[{t:"Änderungsrichtlinie (EU) 2026/470",u:"https://eur-lex.europa.eu/eli/dir/2026/470/oj"}]},
+  esrs:{kpi:[{v:"> 60 %",l:"weniger Pflicht-Datenpunkte"},{v:"3.7.2026",l:"revidierte Fassung erlassen"},{v:"GJ 2027",l:"Pflichtanwendung"}],links:[{t:"ESRS E1 – Klimawandel (konsolidiert)",u:"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:02023R2772-20250101#id-8a081fab-9edf-4234-adec-5f8138c51549"}]},
+  taxvo:{kpi:[{v:"− 64 %",l:"Datenpunkte Nicht-Finanzunternehmen"},{v:"10 %",l:"Wesentlichkeitsschwelle je KPI"},{v:"8.1.2026",l:"DelVO (EU) 2026/73 im Amtsblatt"}],links:[]},
+  csddd:{kpi:[{v:"26.7.2027",l:"Umsetzungsfrist"},{v:"5.000 / 1,5 Mrd. €",l:"Schwellen nach Omnibus I"}],links:[]},
+  sogl:{kpi:[{v:"7.3.2025",l:"ACER-Entwurf Netzkodex Demand Response"},{v:"ab 2027",l:"erwartete nationale Anwendung"}],links:[{t:"ACER – Netzkodex Demand Response",u:"https://www.acer.europa.eu/electricity/market-rules/demand-response"}]},
+  ied:{kpi:[{v:"1.7.2026",l:"Umsetzungsfrist"},{v:"21.1.2026",l:"Kabinettsbeschluss Mantelgesetz"},{v:"2030",l:"Frist Transformationsplan"}],links:[{t:"BMUKN – Umsetzung der IED-Novelle",u:"https://www.bundesumweltministerium.de/gesetz/entwurf-eines-gesetzes-und-einer-verordnung-zur-umsetzung-der-richtlinie-eu-2024-1785-zur-aenderung-der-richtlinie-2010-75-eu-ueber-industrieemissionen-2026"}]},
+  /* --- neue deutsche Rechtsakte --- */
+  stromnev:{kpi:[{v:"7.000 h",l:"Benutzungsstunden für § 19 Abs. 2 S. 2"},{v:"bis 90 %",l:"mögliche Entgeltreduzierung"},{v:"10 GWh",l:"Mindestabnahme"}],links:[{t:"BNetzA – AgNES-Verfahren",u:"https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Netzentgelte/start.html"}]},
+  aregv:{kpi:[{v:"5,07 %",l:"EK-Zins Neuanlagen Strom (4. Periode)"},{v:"5 Jahre",l:"Regulierungsperiode"}],links:[]},
+  mabis:{kpi:[{v:"1.4. / 1.10.2026",l:"verbindliche MaKo-Releases"}],links:[{t:"BDEW – Anwendungshandbücher Marktkommunikation",u:"https://www.bdew-mako.de/"}]},
+  kvbg:{kpi:[{v:"9.869 MW",l:"Zielniveau Steinkohle 2026"},{v:"17 GW",l:"Kohleleistung 2030"},{v:"2038",l:"spätestes Ende"}],links:[{t:"BNetzA – Kohleausstieg",u:"https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Kohleausstieg/start.html"}]},
+  energiestg:{kpi:[{v:"70 %",l:"Jahresnutzungsgrad für § 53a"},{v:"2 MW",l:"Schwelle § 53 Stromerzeugung"}],links:[{t:"Zoll – Energiesteuerentlastungen",u:"https://www.zoll.de/DE/Fachthemen/Steuern/Verbrauchsteuern/Energie/energie_node.html"}]},
+  stromstg:{kpi:[{v:"20,50 €/MWh",l:"Regelsteuersatz"},{v:"0,05 ct/kWh",l:"prod. Gewerbe ab 2026"},{v:"2 MW",l:"Befreiungsschwelle § 9"}],links:[]},
+  kwkausv:{kpi:[{v:"1–50 MW",l:"Ausschreibungssegment"},{v:"30.000 h",l:"Vollbenutzungsstunden je Zuschlag"},{v:"Dez. 2025",l:"letzte Gebotsrunde"}],links:[{t:"BNetzA – KWK-Ausschreibungen",u:"https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Ausschreibungen/KWK/start.html"}]},
+  lksg:{kpi:[{v:"1.000",l:"Beschäftigte (Schwelle)"},{v:"entfallen",l:"jährliche Berichtspflicht"},{v:"26.7.2027",l:"Ablösung durch CSDDD"}],links:[{t:"BAFA – Lieferkettensorgfaltspflichten",u:"https://www.bafa.de/DE/Lieferketten/lieferketten_node.html"}]},
+  bsig:{kpi:[{v:"6.12.2025",l:"in Kraft"},{v:"~29.500",l:"erfasste Einrichtungen"},{v:"24 / 72 h",l:"Melde­fristen"}],links:[{t:"BSI – NIS-2-Umsetzung",u:"https://www.bsi.bund.de/DE/Themen/Regulierte-Wirtschaft/NIS-2-regulierte-Unternehmen/nis-2-regulierte-unternehmen_node.html"}]},
+  kritisv:{kpi:[{v:"500.000",l:"versorgte Menschen (Regelschwelle)"},{v:"420 MW",l:"Schwelle Stromerzeugung"},{v:"3.700 GWh",l:"Schwelle Stromverteilung"}],links:[]},
+  bimschv1344:{kpi:[{v:"ab 50 MW",l:"13. BImSchV"},{v:"1–50 MW",l:"44. BImSchV"},{v:"1.1.2030",l:"Bestandsanlagen 1–5 MW"}],links:[{t:"44. BImSchV (mittelgroße Feuerungsanlagen)",u:"https://www.gesetze-im-internet.de/bimschv_44/BJNR080410019.html"}]},
+  bimschv17:{kpi:[{v:"850 °C",l:"Mindesttemperatur"},{v:"2 s",l:"Verweilzeit"},{v:"2024",l:"Einbezug in den nEHS"}],links:[]},
+  /* --- Förderungen --- */
+  ccfd:{kpi:[{v:"5 Mrd. €",l:"Volumen Gebotsrunde 2026"},{v:"7.9.2026",l:"Ende der Gebotsfrist"},{v:"15 Jahre",l:"Vertragslaufzeit"}],links:[{t:"CO₂-Differenzverträge – Gebotsverfahren",u:"https://www.co2-differenzvertraege.info/thema/aktuelles_gebotsverfahren"}]},
+  bafa:{kpi:[{v:"1.4.2026",l:"Ende BEW-Modul 1"},{v:"31.3.2026",l:"letzter Antragseingang"},{v:"21.7.2026",l:"Ende des Förderstopps"}],links:[{t:"BAFA – Energie",u:"https://www.bafa.de/DE/Energie/energie_node.html"}]},
+  kfw:{kpi:[{v:"270",l:"Erneuerbare Energien – Standard"},{v:"eingestellt",l:"Zuschuss 442 (seit 2024)"},{v:"31.12.2026",l:"Ende der EH-55-Förderung"}],links:[{t:"KfW – Förderprodukte",u:"https://www.kfw.de/inlandsfoerderung/"}]},
+  carbonleak:{kpi:[{v:"80 % / 75 %",l:"Erstattung Tabelle 1 / 2"},{v:"2025–2030",l:"Abrechnungsjahre"},{v:"5.1.2026",l:"neue Beihilfeleitlinien"}],links:[]},
+  besar:{kpi:[{v:"15 %",l:"verbleibender Umlageanteil"},{v:"30. Juni",l:"jährliche Antragsfrist"}],links:[{t:"BAFA – Besondere Ausgleichsregelung",u:"https://www.bafa.de/DE/Energie/Energiefinanzierungsgesetz/energiefinanzierungsgesetz_node.html"}]},
+  h2foerd:{kpi:[{v:"4",l:"IPCEI-Wellen (Hy2Tech bis Hy2Move)"}],links:[{t:"Europäische Wasserstoffbank",u:"https://energy.ec.europa.eu/topics/energy-systems-integration/hydrogen/european-hydrogen-bank_en"}]},
+  /* --- Standards --- */
+  ghgpscope2:{kpi:[{v:"31.1.2026",l:"Ende der ersten Konsultation"},{v:"2027",l:"erwartete Endfassung"},{v:"2",l:"Methoden (markt- und standortbasiert)"}],links:[{t:"GHG Protocol – Standard Development Plan",u:"https://ghgprotocol.org/calculation-tools-and-guidance"}]},
+  ghgpscope3:{kpi:[{v:"15",l:"Scope-3-Kategorien"}],links:[]},
+  sbtinz:{kpi:[{v:"11.6.2026",l:"Version 2.0 veröffentlicht"},{v:"1.2.2028",l:"V2.0 verbindlich"},{v:"90 %",l:"Mindestreduktion bis 2050"}],links:[{t:"SBTi – Corporate Net-Zero Standard V2",u:"https://sciencebasedtargets.org/corporate-net-zero-standard-v2"}]},
+  iso50001:{kpi:[{v:"7,5 GWh",l:"EnEfG-Schwelle für Managementsysteme"},{v:"2018",l:"gültige Fassung"}],links:[]},
+  makostd:{kpi:[{v:"1.4.2024",l:"AS4 verbindlich (Strom)"},{v:"1.4. / 1.10.2026",l:"verbindliche Releases"}],links:[{t:"BNetzA – Mitteilungen zu Datenformaten",u:"https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK06/BK6_83_Zug_Mess/835_mitteilungen_datenformate/mitteilungen_datenformate.html"}]},
+  vdear:{kpi:[{v:"135 kW",l:"Grenze VDE-AR-N 4105"}],links:[]}
 };
 N.forEach(n=>{ if(EXTRA[n.id]){ n.kpi=EXTRA[n.id].kpi; n.links=EXTRA[n.id].links; } });
 /* ================= VRONIS ENERGIE-BRIEFING ================= */

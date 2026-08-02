@@ -6,8 +6,13 @@ Zwei Routinen pflegen `index.html` automatisch. Sie laufen als **Claude-Code-Clo
 
 | Datei | Was | Zeitplan (Berlin) | Cron (UTC) | Routine-ID |
 |---|---|---|---|---|
-| [faktencheck-montag.md](faktencheck-montag.md) | Rechtsakte (`N`, `EXTRA`) challengen & aktualisieren | Mo 07:00 | `0 5 * * 1` | `trig_01TAxHmZLyExom4NEwE1izn6` |
+| [faktencheck-montag.md](faktencheck-montag.md) | Einträge (`N`, `E`, `EXTRA`) challengen & aktualisieren | Mo 07:00 | `0 5 * * 1` | `trig_01TAxHmZLyExom4NEwE1izn6` |
 | [energie-briefing.md](energie-briefing.md) | News-Array (`NEWS`) aktualisieren | Mo/Mi/Fr 08:00 | `0 6 * * 1,3,5` | `trig_01VPG7qUFDtbZqH2z4c3pecr` |
+
+Seit dem Ausbau auf rund 120 Einträge (Rechtsakte, Förderungen, Standards) prüft der Fakten-Check
+nicht mehr alles jede Woche, sondern **wöchentlich die volatilen Einträge plus einen von vier
+Rotationsblöcken** (`KW mod 4`). Damit ist jeder Eintrag spätestens nach vier Wochen wieder dran.
+Förderprogramme werden dabei ausdrücklich auch daraufhin geprüft, ob es sie überhaupt noch gibt.
 
 Beide laufen mit `claude-opus-5`, ohne MCP-Connectors (die API hängt sonst automatisch alle
 verbundenen Connectors an – für diese Aufgabe unnötige Rechte) und mit den Tools
