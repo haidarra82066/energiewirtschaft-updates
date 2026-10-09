@@ -1,7 +1,8 @@
 ---
-name: Vroni · Energie-Briefing Mo/Mi/Fr
-cron_expression: "0 6 * * 1,3,5"   # Mo/Mi/Fr 06:00 UTC = 08:00 Berlin (Sommerzeit) / 07:00 (Winterzeit)
-model: claude-opus-5
+name: Vroni · Energie-Briefing Di/Do
+cron_expression: "0 4 * * 2,4"   # Di/Do 04:00 UTC = 05:00 Berlin (Winterzeit) / 06:00 (Sommerzeit)
+model: claude-opus-5-5
+effort: high
 repo: https://github.com/haidarra82066/energiewirtschaft-updates
 allowed_tools: [Bash, Read, Write, Edit, Glob, Grep, WebSearch, WebFetch]
 ---

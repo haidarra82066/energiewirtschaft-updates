@@ -7,24 +7,25 @@ Zwei Routinen pflegen `index.html` automatisch. Sie laufen als **Claude-Code-Clo
 | Datei | Was | Zeitplan (Berlin) | Cron (UTC) | Routine-ID |
 |---|---|---|---|---|
 | [faktencheck-montag.md](faktencheck-montag.md) | Einträge (`N`, `E`, `EXTRA`) challengen & aktualisieren | Mo 07:00 | `0 5 * * 1` | `trig_01TAxHmZLyExom4NEwE1izn6` |
-| [energie-briefing.md](energie-briefing.md) | News-Array (`NEWS`) aktualisieren | Mo/Mi/Fr 08:00 | `0 6 * * 1,3,5` | `trig_01VPG7qUFDtbZqH2z4c3pecr` |
+| [energie-briefing.md](energie-briefing.md) | News-Array (`NEWS`) aktualisieren | Di/Do 05:00 | `0 4 * * 2,4` | `trig_01VPG7qUFDtbZqH2z4c3pecr` |
 
 Seit dem Ausbau auf rund 120 Einträge (Rechtsakte, Förderungen, Standards) prüft der Fakten-Check
 nicht mehr alles jede Woche, sondern **wöchentlich die volatilen Einträge plus einen von vier
 Rotationsblöcken** (`KW mod 4`). Damit ist jeder Eintrag spätestens nach vier Wochen wieder dran.
 Förderprogramme werden dabei ausdrücklich auch daraufhin geprüft, ob es sie überhaupt noch gibt.
 
-Beide laufen mit `claude-opus-5`, ohne MCP-Connectors (die API hängt sonst automatisch alle
+Der Fakten-Check läuft mit `claude-opus-5`, das Briefing mit `claude-opus-5-5` (Effort `high`); beide ohne MCP-Connectors (die API hängt sonst automatisch alle
 verbundenen Connectors an – für diese Aufgabe unnötige Rechte) und mit den Tools
 Bash, Read, Write, Edit, Glob, Grep, WebSearch, WebFetch.
 
 Die Routinen greifen sich **nicht** gegenseitig an: Der Fakten-Check lässt `NEWS` und
 `#newsstamp` in Ruhe, das Briefing lässt `N`/`E`/`EXTRA` und die übrigen „Stand"-Stempel in Ruhe.
-Montags liegt eine Stunde zwischen beiden; zusätzlich macht jede vor dem Push ein
+Sie laufen an verschiedenen Tagen (Fakten-Check Mo, Briefing Di/Do); zusätzlich macht jede vor dem Push ein
 `git pull --rebase`.
 
-> Cron ist immer UTC und wandert nicht mit der Sommerzeit. In der Winterzeit laufen die
-> Routinen also eine Stunde früher (06:00 bzw. 07:00 Berlin).
+> Cron ist immer UTC und wandert nicht mit der Sommerzeit. Der Fakten-Check ist auf
+> Sommerzeit gerechnet (Winterzeit: Mo 06:00 Berlin), das Briefing auf Winterzeit
+> (Sommerzeit: Di/Do 06:00 Berlin).
 
 ## Ändern / neu anlegen
 

@@ -38,7 +38,7 @@ Sie brauchen **HTTPS** (GitHub Pages, Netlify und Vercel liefern das) und – au
 Echtes Web-Push (Hinweis kommt an, obwohl die App gar nicht läuft) bräuchte einen eigenen Push-Server mit VAPID-Schlüsseln. Ohne den prüft Vroni auf Android/Chrome periodisch im Hintergrund und auf allen Geräten beim Öffnen bzw. Zurückholen der App.
 
 ## 🔄 Nach Vronis Updates
-Vroni aktualisiert `index.html` in diesem OneDrive-Ordner (montags Fakten-Check, Mo/Mi/Fr News). Danach einfach neu veröffentlichen:
+Vroni aktualisiert `index.html` in diesem OneDrive-Ordner (montags Fakten-Check, Di/Do News). Danach einfach neu veröffentlichen:
 - GitHub Pages: committen & pushen (siehe Option A)
 - Netlify: Seite öffnen → **Deploys** → Zip erneut hineinziehen
 - Vercel CLI: `vercel --prod`

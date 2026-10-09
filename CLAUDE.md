@@ -85,4 +85,4 @@ Ein `push`-Handler liegt in `sw.js` bereit: Käme später ein Push-Server dazu, 
 - Details: siehe DEPLOY-ANLEITUNG.md
 
 ## Automatische Pflege
-Vronis Routinen laufen als Claude-Code-Cloud-Agenten gegen dieses Repo (Fakten-Check Mo, Briefing Mo/Mi/Fr) und pushen selbst auf `main`. Prompts und Zeitpläne: `.claude/routines/` – siehe [.claude/routines/README.md](.claude/routines/README.md).
+Vronis Routinen laufen als Claude-Code-Cloud-Agenten gegen dieses Repo (Fakten-Check Mo, Briefing Di/Do) und pushen selbst auf `main`. Prompts und Zeitpläne: `.claude/routines/` – siehe [.claude/routines/README.md](.claude/routines/README.md).

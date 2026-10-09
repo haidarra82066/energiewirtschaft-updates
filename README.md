@@ -18,7 +18,7 @@ Interaktive Wissenskarte des europäischen und deutschen Energierechts plus rege
 ### 📰 Vronis Energie-Briefing
 - Kuratierte News-Ansicht mit Meldungen zu Regulierung DE, Märkten & Preisen, Technologie, Wasserstoff, Netzen und EU-Politik.
 - Jede Meldung mit Datum, Detailpunkten, Quellenlinks und einer Einordnung **„Warum relevant“** (Fokus: VPP, Flexibilität, BHKW/KWK, Speicher).
-- Aktualisierungsrhythmus: **Mo · Mi · Fr**; jeden Montag zusätzlich Fakten-Check aller Gesetzesinfos.
+- Aktualisierungsrhythmus: **Di · Do**; jeden Montag zusätzlich Fakten-Check aller Gesetzesinfos.
 - Neue Beiträge sind mit **NEU** markiert, ein Banner zählt sie – die Karten selbst bleiben unverändert lesbar.
 
 ### 🔔 Als App inkl. Benachrichtigungen
